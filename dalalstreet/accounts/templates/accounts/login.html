@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login — Dalal Street AI</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#07080f;font-family:'Segoe UI',sans-serif;min-height:100vh;display:flex;flex-direction:column;}
+    .nav{display:flex;justify-content:space-between;align-items:center;padding:16px 40px;border-bottom:0.5px solid rgba(255,255,255,0.07);}
+    .logo{font-size:17px;font-weight:700;color:#fff;text-decoration:none;}
+    .logo span{color:#00d68f;}
+    .nav-link{font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;}
+    .nav-link:hover{color:#fff;}
+    .page{flex:1;display:flex;}
+
+    /* LEFT PANEL */
+    .left{flex:1;padding:60px;display:flex;flex-direction:column;justify-content:center;border-right:0.5px solid rgba(255,255,255,0.06);}
+    .left-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border:0.5px solid rgba(0,214,143,0.25);border-radius:99px;font-size:12px;color:#00d68f;margin-bottom:32px;background:rgba(0,214,143,0.05);}
+    .pulse{display:inline-block;width:6px;height:6px;border-radius:50%;background:#00d68f;animation:pulse 2s infinite;vertical-align:middle;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+    .left h1{font-size:36px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:14px;}
+    .left h1 em{color:#00d68f;font-style:normal;}
+    .left p{font-size:15px;color:rgba(255,255,255,0.4);line-height:1.75;max-width:420px;margin-bottom:40px;}
+    .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:40px;}
+    .stat-box{background:#0f1018;border:0.5px solid rgba(255,255,255,0.07);border-radius:12px;padding:18px;text-align:center;}
+    .stat-val{font-size:22px;font-weight:800;color:#00d68f;}
+    .stat-lbl{font-size:11px;color:rgba(255,255,255,0.35);margin-top:3px;}
+    .quote-box{background:#0f1a14;border:0.5px solid rgba(0,214,143,0.15);border-radius:12px;padding:20px 22px;}
+    .quote-text{font-size:14px;color:rgba(255,255,255,0.6);line-height:1.7;font-style:italic;margin-bottom:10px;}
+    .quote-author{font-size:12px;color:rgba(255,255,255,0.3);}
+    .quote-author strong{color:#00d68f;font-style:normal;}
+
+    /* RIGHT PANEL */
+    .right{width:480px;padding:60px 48px;display:flex;flex-direction:column;justify-content:center;}
+    .form-title{font-size:24px;font-weight:800;color:#fff;margin-bottom:6px;}
+    .form-sub{font-size:14px;color:rgba(255,255,255,0.4);margin-bottom:32px;}
+    .form-sub a{color:#00d68f;text-decoration:none;}
+    .field{margin-bottom:18px;}
+    .field label{display:block;font-size:13px;font-weight:500;color:rgba(255,255,255,0.6);margin-bottom:7px;}
+    .field input{width:100%;padding:11px 14px;background:#111520;border:0.5px solid rgba(255,255,255,0.1);border-radius:9px;color:#fff;font-size:14px;font-family:'Segoe UI',sans-serif;outline:none;transition:border-color .2s;}
+    .field input:focus{border-color:rgba(0,214,143,0.4);}
+    .field input::placeholder{color:rgba(255,255,255,0.2);}
+    .btn-submit{width:100%;padding:13px;background:#00d68f;color:#07080f;font-size:15px;font-weight:700;border:none;border-radius:10px;cursor:pointer;margin-top:4px;transition:opacity .2s;}
+    .btn-submit:hover{opacity:.9;}
+    .error{background:rgba(255,107,107,0.08);border:0.5px solid rgba(255,107,107,0.2);border-radius:8px;padding:10px 14px;font-size:13px;color:#ff6b6b;margin-bottom:18px;}
+    .divider-text{text-align:center;font-size:12px;color:rgba(255,255,255,0.2);margin:24px 0;position:relative;}
+    .divider-text::before,.divider-text::after{content:'';position:absolute;top:50%;width:40%;height:0.5px;background:rgba(255,255,255,0.07);}
+    .divider-text::before{left:0;}
+    .divider-text::after{right:0;}
+    .perks{display:flex;flex-direction:column;gap:10px;}
+    .perk{display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,0.4);}
+    .perk-dot{width:6px;height:6px;border-radius:50%;background:#00d68f;flex-shrink:0;}
+    .terms{font-size:12px;color:rgba(255,255,255,0.2);text-align:center;margin-top:24px;line-height:1.6;}
+
+    @media(max-width:900px){
+      .left{display:none;}
+      .right{width:100%;padding:40px 24px;}
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="logo" href="{% url 'landing' %}">📈 Dalal Street <span>AI</span></a>
+  <a class="nav-link" href="{% url 'register' %}">No account yet? Register free →</a>
+</nav>
+
+<div class="page">
+
+  <!-- LEFT -->
+  <div class="left">
+    <div class="left-badge"><span class="pulse"></span> Markets are open · NSE Live</div>
+    <h1>Welcome back.<br><em>The market waits</em><br>for no one.</h1>
+    <p>Log in to check your portfolio, see what moved while you were away, and make your next trade. Your AI mentor has been watching the market for you.</p>
+
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-val">₹10L</div>
+        <div class="stat-lbl">Your virtual balance</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val">425+</div>
+        <div class="stat-lbl">Live NSE stocks</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val">0 Risk</div>
+        <div class="stat-lbl">Always free</div>
+      </div>
+    </div>
+
+    <div class="quote-box">
+      <div class="quote-text">"The stock market is a device for transferring money from the impatient to the patient."</div>
+      <div class="quote-author">— <strong>Warren Buffett</strong></div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right">
+    <div class="form-title">Login to your account</div>
+    <div class="form-sub">New here? <a href="{% url 'register' %}">Create a free account</a></div>
+
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST">
+      {% csrf_token %}
+      <div class="field">
+        <label>Username</label>
+        <input type="text" name="username" placeholder="Your username" required autofocus>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Your password" required>
+      </div>
+      <button type="submit" class="btn-submit">Login to dashboard →</button>
+    </form>
+
+    <div class="divider-text">what's waiting for you</div>
+
+    <div class="perks">
+      <div class="perk"><span class="perk-dot"></span>Your live portfolio with real-time P&L</div>
+      <div class="perk"><span class="perk-dot"></span>425+ NSE stocks at live market prices</div>
+      <div class="perk"><span class="perk-dot"></span>AI mentor insights on your last trades</div>
+      <div class="perk"><span class="perk-dot"></span>Pending missions and XP waiting to be earned</div>
+      <div class="perk"><span class="perk-dot"></span>Market movers — biggest gains and losses today</div>
+    </div>
+
+    <p class="terms">This platform uses virtual money only. No real investments are made. For educational purposes only.</p>
+  </div>
+
+</div>
+</body>
+</html>
