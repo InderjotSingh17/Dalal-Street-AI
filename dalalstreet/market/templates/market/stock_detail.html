@@ -1,0 +1,396 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ stock.symbol }} — Dalal Street AI</title>
+  <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#07080f;color:#e8e8f0;font-family:'Segoe UI',sans-serif;}
+
+    /* NAV */
+    .nav{display:flex;justify-content:space-between;align-items:center;padding:0 32px;height:56px;background:#07080f;border-bottom:0.5px solid rgba(255,255,255,0.07);position:sticky;top:0;z-index:100;}
+    .nav-left{display:flex;align-items:center;gap:32px;}
+    .logo{font-size:16px;font-weight:700;color:#fff;text-decoration:none;}
+    .logo span{color:#00d68f;}
+    .nav-tabs{display:flex;}
+    .nav-tab{padding:0 16px;height:56px;display:flex;align-items:center;font-size:14px;color:rgba(255,255,255,0.5);text-decoration:none;border-bottom:2px solid transparent;}
+    .nav-tab:hover{color:#fff;}
+    .nav-tab.active{color:#fff;border-bottom-color:#00d68f;}
+    .nav-right{display:flex;align-items:center;gap:16px;}
+    .balance-chip{background:#111520;border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 14px;font-size:13px;}
+    .balance-chip span{color:#00d68f;font-weight:700;}
+    .btn-logout{font-size:12px;padding:6px 14px;border:0.5px solid rgba(255,255,255,0.1);border-radius:7px;background:transparent;color:rgba(255,255,255,0.5);text-decoration:none;}
+
+    /* BREADCRUMB */
+    .breadcrumb{padding:14px 32px;font-size:13px;color:rgba(255,255,255,0.35);border-bottom:0.5px solid rgba(255,255,255,0.06);}
+    .breadcrumb a{color:rgba(255,255,255,0.35);text-decoration:none;}
+    .breadcrumb a:hover{color:#00d68f;}
+
+    /* LAYOUT */
+    .layout{display:grid;grid-template-columns:1fr 320px;min-height:calc(100vh - 112px);}
+    .main{padding:24px 32px;border-right:0.5px solid rgba(255,255,255,0.06);overflow-y:auto;}
+    .panel{padding:20px;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;}
+
+    /* STOCK HEADER */
+    .stock-header{margin-bottom:20px;}
+    .stock-symbol{font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:4px;}
+    .stock-name{font-size:22px;font-weight:800;color:#fff;margin-bottom:12px;}
+    .price-row{display:flex;align-items:baseline;gap:12px;margin-bottom:8px;}
+    .price-big{font-size:36px;font-weight:800;color:#fff;}
+    .price-change-up{font-size:16px;font-weight:600;color:#00d68f;}
+    .price-change-down{font-size:16px;font-weight:600;color:#ff6b6b;}
+    .price-meta{font-size:13px;color:rgba(255,255,255,0.35);}
+
+    /* CHART TABS */
+    .chart-tabs{display:flex;gap:0;margin-bottom:0;border-bottom:0.5px solid rgba(255,255,255,0.07);}
+    .chart-tab{padding:8px 16px;font-size:13px;color:rgba(255,255,255,0.4);cursor:pointer;border-bottom:2px solid transparent;}
+    .chart-tab.active{color:#00d68f;border-bottom-color:#00d68f;}
+
+    /* CHART */
+    #chart{width:100%;height:320px;margin-bottom:24px;background:#0f1018;border-radius:12px;border:0.5px solid rgba(255,255,255,0.07);}
+
+    /* PERFORMANCE */
+    .perf-section{margin-bottom:24px;}
+    .section-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:14px;padding-bottom:8px;border-bottom:0.5px solid rgba(255,255,255,0.07);}
+    .perf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+    .perf-item{background:#0f1018;border:0.5px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px;}
+    .perf-label{font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:4px;}
+    .perf-value{font-size:15px;font-weight:700;color:#fff;}
+
+    /* 52 WEEK RANGE */
+    .range-bar{margin-bottom:24px;}
+    .range-labels{display:flex;justify-content:space-between;font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:6px;}
+    .range-track{height:4px;background:rgba(255,255,255,0.1);border-radius:2px;position:relative;}
+    .range-fill{height:100%;border-radius:2px;background:linear-gradient(to right,#ff6b6b,#00d68f);}
+    .range-dot{width:10px;height:10px;border-radius:50%;background:#fff;border:2px solid #00d68f;position:absolute;top:-3px;transform:translateX(-50%);}
+
+    /* FUNDAMENTALS */
+    .fund-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:0.5px solid rgba(255,255,255,0.07);border-radius:12px;overflow:hidden;margin-bottom:24px;}
+    .fund-row{display:grid;grid-template-columns:1fr 1fr;border-bottom:0.5px solid rgba(255,255,255,0.07);}
+    .fund-row:last-child{border-bottom:none;}
+    .fund-cell{padding:12px 16px;border-right:0.5px solid rgba(255,255,255,0.07);}
+    .fund-cell:last-child{border-right:none;}
+    .fund-label{font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:3px;}
+    .fund-val{font-size:14px;font-weight:600;color:#fff;}
+
+    /* BUY/SELL PANEL */
+    .trade-card{background:#0f1018;border:0.5px solid rgba(255,255,255,0.08);border-radius:14px;padding:20px;margin-bottom:16px;}
+    .trade-tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:0.5px solid rgba(255,255,255,0.07);}
+    .trade-tab{flex:1;padding:10px;text-align:center;font-size:14px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;color:rgba(255,255,255,0.4);}
+    .trade-tab.buy.active{color:#00d68f;border-bottom-color:#00d68f;}
+    .trade-tab.sell.active{color:#ff6b6b;border-bottom-color:#ff6b6b;}
+    .trade-field{margin-bottom:14px;}
+    .trade-label{font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:6px;}
+    .trade-input{width:100%;padding:10px 14px;background:#111520;border:0.5px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;font-size:14px;font-family:'Segoe UI',sans-serif;outline:none;}
+    .trade-input:focus{border-color:rgba(0,214,143,0.4);}
+    .trade-summary{background:#111520;border-radius:8px;padding:12px;margin-bottom:14px;font-size:13px;}
+    .trade-sum-row{display:flex;justify-content:space-between;padding:4px 0;color:rgba(255,255,255,0.5);}
+    .trade-sum-row strong{color:#fff;}
+    .btn-buy-now{width:100%;padding:13px;background:#00d68f;color:#07080f;font-size:15px;font-weight:700;border:none;border-radius:10px;cursor:pointer;}
+    .btn-sell-now{width:100%;padding:13px;background:#ff6b6b;color:#fff;font-size:15px;font-weight:700;border:none;border-radius:10px;cursor:pointer;}
+    .balance-info{font-size:12px;color:rgba(255,255,255,0.35);text-align:center;margin-top:10px;}
+    .holding-info{background:#0f1a14;border:0.5px solid rgba(0,214,143,0.15);border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;}
+    .holding-title{font-size:11px;font-weight:700;color:#00d68f;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+    .holding-row{display:flex;justify-content:space-between;padding:3px 0;color:rgba(255,255,255,0.5);}
+    .holding-row strong{color:#fff;}
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-left">
+    <a class="logo" href="{% url 'landing' %}">📈 Dalal Street <span>AI</span></a>
+    <div class="nav-tabs">
+      <a class="nav-tab active" href="{% url 'dashboard' %}">Explore</a>
+      <a class="nav-tab" href="#">Holdings</a>
+      <a class="nav-tab" href="#">Orders</a>
+      <a class="nav-tab" href="#">Watchlist</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="balance-chip">Balance: <span>₹{{ balance|floatformat:0 }}</span></div>
+    <a class="btn-logout" href="{% url 'logout' %}">Logout</a>
+  </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <a href="{% url 'dashboard' %}">Explore</a> &nbsp;›&nbsp; {{ stock.symbol }}
+</div>
+
+<div class="layout">
+  <div class="main">
+
+    <!-- STOCK HEADER -->
+    <div class="stock-header">
+      <div class="stock-symbol">{{ stock.symbol }} · NSE</div>
+      <div class="stock-name">{{ stock.company_name }}</div>
+      <div class="price-row">
+        <div class="price-big">₹{{ stock.current_price }}</div>
+        {% if stock.change_percent >= 0 %}
+          <div class="price-change-up">▲ {{ stock.change_percent }}% today</div>
+        {% else %}
+          <div class="price-change-down">▼ {{ stock.change_percent|stringformat:".2f"|slice:"1:" }}% today</div>
+        {% endif %}
+      </div>
+      <div class="price-meta">Prev close ₹{{ stock.previous_close }} &nbsp;·&nbsp; Open ₹{{ stock.open_price }} &nbsp;·&nbsp; Vol {{ stock.volume|default:"—" }}</div>
+    </div>
+
+    <!-- CHART TABS -->
+    <div class="chart-tabs">
+      <div class="chart-tab active">1D</div>
+      <div class="chart-tab">1W</div>
+      <div class="chart-tab">1M</div>
+      <div class="chart-tab">3M</div>
+      <div class="chart-tab">1Y</div>
+    </div>
+
+    <!-- CHART -->
+    <div id="chart"></div>
+
+    <!-- PERFORMANCE -->
+    <div class="perf-section">
+      <div class="section-title">Performance</div>
+      <div class="perf-grid">
+        <div class="perf-item">
+          <div class="perf-label">Today's low</div>
+          <div class="perf-value">₹{{ stock.day_low|default:"—" }}</div>
+        </div>
+        <div class="perf-item">
+          <div class="perf-label">Today's high</div>
+          <div class="perf-value">₹{{ stock.day_high|default:"—" }}</div>
+        </div>
+        <div class="perf-item">
+          <div class="perf-label">Open price</div>
+          <div class="perf-value">₹{{ stock.open_price|default:"—" }}</div>
+        </div>
+        <div class="perf-item">
+          <div class="perf-label">Prev close</div>
+          <div class="perf-value">₹{{ stock.previous_close }}</div>
+        </div>
+        <div class="perf-item">
+          <div class="perf-label">52W high</div>
+          <div class="perf-value">₹{{ stock.week52_high|default:"—" }}</div>
+        </div>
+        <div class="perf-item">
+          <div class="perf-label">52W low</div>
+          <div class="perf-value">₹{{ stock.week52_low|default:"—" }}</div>
+        </div>
+      </div>
+
+      <!-- 52 WEEK RANGE BAR -->
+      {% if stock.week52_high and stock.week52_low and stock.week52_high > stock.week52_low %}
+      <div class="range-bar">
+        <div class="range-labels">
+          <span>52W Low ₹{{ stock.week52_low }}</span>
+          <span>Current ₹{{ stock.current_price }}</span>
+          <span>52W High ₹{{ stock.week52_high }}</span>
+        </div>
+        <div class="range-track">
+          <div class="range-fill" id="rangeFill"></div>
+          <div class="range-dot" id="rangeDot"></div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- FUNDAMENTALS -->
+    <div class="section-title">Fundamentals</div>
+    <div class="fund-grid">
+      <div class="fund-row">
+        <div class="fund-cell">
+          <div class="fund-label">Market Cap</div>
+          <div class="fund-val">{% if stock.market_cap %}₹{% widthratio stock.market_cap 10000000 1 %} Cr{% else %}—{% endif %}</div>
+        </div>
+        <div class="fund-cell">
+          <div class="fund-label">P/E Ratio (TTM)</div>
+          <div class="fund-val">{{ stock.pe_ratio|default:"—" }}</div>
+        </div>
+      </div>
+      <div class="fund-row">
+        <div class="fund-cell">
+          <div class="fund-label">EPS (TTM)</div>
+          <div class="fund-val">{% if stock.eps %}₹{{ stock.eps }}{% else %}—{% endif %}</div>
+        </div>
+        <div class="fund-cell">
+          <div class="fund-label">P/B Ratio</div>
+          <div class="fund-val">{{ stock.pb_ratio|default:"—" }}</div>
+        </div>
+      </div>
+      <div class="fund-row">
+        <div class="fund-cell">
+          <div class="fund-label">ROE</div>
+          <div class="fund-val">{% if stock.roe %}{{ stock.roe }}%{% else %}—{% endif %}</div>
+        </div>
+        <div class="fund-cell">
+          <div class="fund-label">Dividend Yield</div>
+          <div class="fund-val">{% if stock.dividend_yield %}{{ stock.dividend_yield }}%{% else %}—{% endif %}</div>
+        </div>
+      </div>
+      <div class="fund-row">
+        <div class="fund-cell">
+          <div class="fund-label">Book Value</div>
+          <div class="fund-val">{% if stock.book_value %}₹{{ stock.book_value }}{% else %}—{% endif %}</div>
+        </div>
+        <div class="fund-cell">
+          <div class="fund-label">Debt to Equity</div>
+          <div class="fund-val">{{ stock.debt_to_equity|default:"—" }}</div>
+        </div>
+      </div>
+      <div class="fund-row">
+        <div class="fund-cell">
+          <div class="fund-label">Sector</div>
+          <div class="fund-val">{{ stock.sector|default:"—" }}</div>
+        </div>
+        <div class="fund-cell">
+          <div class="fund-label">Volume</div>
+          <div class="fund-val">{{ stock.volume|default:"—" }}</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BUY/SELL PANEL -->
+  <div class="panel">
+
+    {% if holding %}
+    <div class="holding-info">
+      <div class="holding-title">Your holding</div>
+      <div class="holding-row"><span>Quantity</span><strong>{{ holding.quantity }} shares</strong></div>
+      <div class="holding-row"><span>Avg buy price</span><strong>₹{{ holding.avg_buy_price }}</strong></div>
+      <div class="holding-row"><span>Current value</span><strong>₹{% widthratio holding.quantity 1 stock.current_price %}</strong></div>
+    </div>
+    {% endif %}
+
+    <div class="trade-card">
+      <div class="trade-tabs">
+        <div class="trade-tab buy active" onclick="switchTab('buy')">Buy</div>
+        <div class="trade-tab sell" onclick="switchTab('sell')">Sell</div>
+      </div>
+
+      <div id="buyPanel">
+        <div class="trade-field">
+          <div class="trade-label">Quantity</div>
+          <input class="trade-input" type="number" id="buyQty" min="1" value="1" oninput="updateBuySummary()">
+        </div>
+        <div class="trade-field">
+          <div class="trade-label">Price (Market)</div>
+          <input class="trade-input" value="₹{{ stock.current_price }}" readonly>
+        </div>
+        <div class="trade-summary" id="buySummary">
+          <div class="trade-sum-row"><span>Price per share</span><strong>₹{{ stock.current_price }}</strong></div>
+          <div class="trade-sum-row"><span>Quantity</span><strong id="buyQtyDisplay">1</strong></div>
+          <div class="trade-sum-row"><span>Total amount</span><strong id="buyTotal">₹{{ stock.current_price }}</strong></div>
+        </div>
+        <form method="POST" action="/buy/{{ stock.symbol }}/">
+          {% csrf_token %}
+          <input type="hidden" name="quantity" id="buyQtyHidden" value="1">
+          <button type="submit" class="btn-buy-now">Buy {{ stock.symbol }}</button>
+        </form>
+        <div class="balance-info">Available: ₹{{ balance|floatformat:0 }}</div>
+      </div>
+
+      <div id="sellPanel" style="display:none;">
+        <div class="trade-field">
+          <div class="trade-label">Quantity</div>
+          <input class="trade-input" type="number" id="sellQty" min="1" value="1" oninput="updateSellSummary()">
+        </div>
+        <div class="trade-field">
+          <div class="trade-label">Price (Market)</div>
+          <input class="trade-input" value="₹{{ stock.current_price }}" readonly>
+        </div>
+        <div class="trade-summary" id="sellSummary">
+          <div class="trade-sum-row"><span>Price per share</span><strong>₹{{ stock.current_price }}</strong></div>
+          <div class="trade-sum-row"><span>Quantity</span><strong id="sellQtyDisplay">1</strong></div>
+          <div class="trade-sum-row"><span>You receive</span><strong id="sellTotal">₹{{ stock.current_price }}</strong></div>
+        </div>
+        <form method="POST" action="/sell/{{ stock.symbol }}/">
+          {% csrf_token %}
+          <input type="hidden" name="quantity" id="sellQtyHidden" value="1">
+          <button type="submit" class="btn-sell-now">Sell {{ stock.symbol }}</button>
+        </form>
+        <div class="balance-info">{% if holding %}Holdings: {{ holding.quantity }} shares{% else %}You don't own this stock{% endif %}</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const price = {{ stock.current_price }};
+  const low52 = {{ stock.week52_low|default:0 }};
+  const high52 = {{ stock.week52_high|default:0 }};
+
+  // 52W range bar
+  if (high52 > low52) {
+    const pct = ((price - low52) / (high52 - low52)) * 100;
+    const fill = document.getElementById('rangeFill');
+    const dot = document.getElementById('rangeDot');
+    if (fill) fill.style.width = pct + '%';
+    if (dot) dot.style.left = pct + '%';
+  }
+
+  // Buy/Sell tabs
+  function switchTab(tab) {
+    document.getElementById('buyPanel').style.display = tab === 'buy' ? 'block' : 'none';
+    document.getElementById('sellPanel').style.display = tab === 'sell' ? 'block' : 'none';
+    document.querySelectorAll('.trade-tab').forEach(t => t.classList.remove('active'));
+    document.querySelector('.trade-tab.' + tab).classList.add('active');
+  }
+
+  // Buy summary
+  function updateBuySummary() {
+    const qty = parseInt(document.getElementById('buyQty').value) || 1;
+    const total = (price * qty).toFixed(2);
+    document.getElementById('buyQtyDisplay').textContent = qty;
+    document.getElementById('buyTotal').textContent = '₹' + total;
+    document.getElementById('buyQtyHidden').value = qty;
+  }
+
+  // Sell summary
+  function updateSellSummary() {
+    const qty = parseInt(document.getElementById('sellQty').value) || 1;
+    const total = (price * qty).toFixed(2);
+    document.getElementById('sellQtyDisplay').textContent = qty;
+    document.getElementById('sellTotal').textContent = '₹' + total;
+    document.getElementById('sellQtyHidden').value = qty;
+  }
+
+  // Chart using lightweight-charts
+  const chart = LightweightCharts.createChart(document.getElementById('chart'), {
+    width: document.getElementById('chart').offsetWidth,
+    height: 320,
+    layout: { background: { color: '#0f1018' }, textColor: '#888' },
+    grid: { vertLines: { color: 'rgba(255,255,255,0.04)' }, horzLines: { color: 'rgba(255,255,255,0.04)' } },
+    crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+    rightPriceScale: { borderColor: 'rgba(255,255,255,0.1)' },
+    timeScale: { borderColor: 'rgba(255,255,255,0.1)', timeVisible: true },
+  });
+
+  const lineSeries = chart.addLineSeries({
+    color: '{{ stock.change_percent }}' >= 0 ? '#00d68f' : '#ff6b6b',
+    lineWidth: 2,
+  });
+
+  // Generate mock intraday data based on current price
+  const now = Math.floor(Date.now() / 1000);
+  const data = [];
+  let p = parseFloat('{{ stock.previous_close }}');
+  for (let i = 0; i < 78; i++) {
+    p = p + (Math.random() - 0.48) * (p * 0.003);
+    data.push({ time: now - (78 - i) * 300, value: parseFloat(p.toFixed(2)) });
+  }
+  data.push({ time: now, value: price });
+  lineSeries.setData(data);
+
+  window.addEventListener('resize', () => {
+    chart.applyOptions({ width: document.getElementById('chart').offsetWidth });
+  });
+</script>
+</body>
+</html>

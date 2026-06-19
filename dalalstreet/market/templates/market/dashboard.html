@@ -3,51 +3,273 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dalal Street AI</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>Explore — Dalal Street AI</title>
   <style>
-    body { background: #f8f9fa; font-family: 'Segoe UI', sans-serif; }
-    .navbar { background: #1a1a2e; }
-    .stock-card { border-radius: 12px; border: none; transition: transform 0.2s; }
-    .stock-card:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-    .positive { color: #00b894; }
-    .negative { color: #d63031; }
-    .badge-up { background: #d4edda; color: #155724; }
-    .badge-down { background: #f8d7da; color: #721c24; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#07080f;color:#e8e8f0;font-family:'Segoe UI',sans-serif;line-height:1.6}
+
+    /* NAV */
+    .nav{display:flex;justify-content:space-between;align-items:center;padding:0 32px;height:56px;background:#07080f;border-bottom:0.5px solid rgba(255,255,255,0.07);position:sticky;top:0;z-index:100;}
+    .nav-left{display:flex;align-items:center;gap:32px;}
+    .logo{font-size:16px;font-weight:700;color:#fff;text-decoration:none;}
+    .logo span{color:#00d68f;}
+    .nav-tabs{display:flex;gap:0;}
+    .nav-tab{padding:0 16px;height:56px;display:flex;align-items:center;font-size:14px;color:rgba(255,255,255,0.5);text-decoration:none;border-bottom:2px solid transparent;transition:color .2s;}
+    .nav-tab:hover{color:#fff;}
+    .nav-tab.active{color:#fff;border-bottom-color:#00d68f;}
+    .nav-right{display:flex;align-items:center;gap:16px;}
+    .balance-chip{background:#111520;border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 14px;font-size:13px;}
+    .balance-chip span{color:#00d68f;font-weight:700;}
+    .user-chip{font-size:13px;color:rgba(255,255,255,0.5);}
+    .btn-logout{font-size:12px;padding:6px 14px;border:0.5px solid rgba(255,255,255,0.1);border-radius:7px;background:transparent;color:rgba(255,255,255,0.5);text-decoration:none;cursor:pointer;}
+
+    /* INDEX BAR */
+    .index-bar{background:#0b0c16;border-bottom:0.5px solid rgba(255,255,255,0.06);padding:10px 32px;display:flex;gap:32px;overflow-x:auto;}
+    .index-item{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+    .index-name{font-size:12px;font-weight:700;color:rgba(255,255,255,0.5);}
+    .index-val{font-size:13px;font-weight:700;color:#fff;}
+    .index-chg.up{font-size:12px;color:#00d68f;}
+    .index-chg.down{font-size:12px;color:#ff6b6b;}
+
+    /* LAYOUT */
+    .layout{display:grid;grid-template-columns:1fr 280px;gap:0;min-height:calc(100vh - 104px);}
+    .main{padding:24px 32px;border-right:0.5px solid rgba(255,255,255,0.06);}
+    .sidebar{padding:20px;}
+
+    /* SEARCH BAR */
+    .search-row{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+    .search-box{flex:1;min-width:200px;position:relative;}
+    .search-box input{width:100%;padding:10px 14px 10px 38px;background:#111520;border:0.5px solid rgba(255,255,255,0.1);border-radius:9px;color:#fff;font-size:14px;font-family:'Segoe UI',sans-serif;outline:none;}
+    .search-box input:focus{border-color:rgba(0,214,143,0.4);}
+    .search-box input::placeholder{color:rgba(255,255,255,0.25);}
+    .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.3);font-size:16px;}
+    .filter-select{padding:10px 14px;background:#111520;border:0.5px solid rgba(255,255,255,0.1);border-radius:9px;color:#fff;font-size:13px;font-family:'Segoe UI',sans-serif;outline:none;cursor:pointer;}
+    .filter-select option{background:#111520;}
+    .btn-search{padding:10px 20px;background:#00d68f;color:#07080f;font-size:13px;font-weight:700;border:none;border-radius:9px;cursor:pointer;}
+
+    /* MOVERS */
+    .movers-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;}
+    .movers-card{background:#0f1018;border:0.5px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px;}
+    .movers-title{font-size:12px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;}
+    .mover-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:0.5px solid rgba(255,255,255,0.04);}
+    .mover-row:last-child{border-bottom:none;}
+    .mover-sym{font-size:13px;font-weight:700;color:#fff;text-decoration:none;}
+    .mover-sym:hover{color:#00d68f;}
+    .mover-name{font-size:11px;color:rgba(255,255,255,0.35);}
+    .mover-price{font-size:13px;font-weight:600;color:#fff;text-align:right;}
+    .badge-up{font-size:11px;color:#00d68f;font-weight:600;}
+    .badge-down{font-size:11px;color:#ff6b6b;font-weight:600;}
+
+    /* STOCKS TABLE */
+    .table-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+    .table-title{font-size:15px;font-weight:700;color:#fff;}
+    .result-count{font-size:12px;color:rgba(255,255,255,0.35);}
+    .stocks-table{width:100%;border-collapse:collapse;}
+    .stocks-table th{padding:10px 12px;text-align:left;font-size:11px;font-weight:600;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:.05em;border-bottom:0.5px solid rgba(255,255,255,0.07);}
+    .stocks-table th.right{text-align:right;}
+    .stocks-table td{padding:12px;border-bottom:0.5px solid rgba(255,255,255,0.04);font-size:14px;}
+    .stocks-table tr:hover td{background:rgba(255,255,255,0.02);}
+    .stock-sym-link{font-weight:700;color:#fff;text-decoration:none;}
+    .stock-sym-link:hover{color:#00d68f;}
+    .stock-company{font-size:12px;color:rgba(255,255,255,0.35);margin-top:2px;}
+    .stock-sector-badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:99px;background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.35);margin-top:3px;}
+    .td-right{text-align:right;}
+    .td-price{font-weight:600;color:#fff;}
+    .chg-up{color:#00d68f;font-weight:600;}
+    .chg-down{color:#ff6b6b;font-weight:600;}
+    .mc-val{font-size:13px;color:rgba(255,255,255,0.6);}
+    .btn-buy{padding:5px 14px;background:rgba(0,214,143,0.1);color:#00d68f;border:0.5px solid rgba(0,214,143,0.2);border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;cursor:pointer;}
+    .btn-buy:hover{background:rgba(0,214,143,0.18);}
+
+    /* SIDEBAR */
+    .sidebar-card{background:#0f1018;border:0.5px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px;margin-bottom:16px;}
+    .sidebar-title{font-size:12px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;}
+    .portfolio-stat{display:flex;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid rgba(255,255,255,0.05);font-size:13px;}
+    .portfolio-stat:last-child{border-bottom:none;}
+    .stat-key{color:rgba(255,255,255,0.45);}
+    .stat-val{color:#fff;font-weight:600;}
+    .sector-pill{display:inline-block;margin:3px;padding:4px 10px;border:0.5px solid rgba(255,255,255,0.08);border-radius:99px;font-size:12px;color:rgba(255,255,255,0.5);text-decoration:none;cursor:pointer;}
+    .sector-pill:hover,.sector-pill.active{background:rgba(0,214,143,0.08);border-color:rgba(0,214,143,0.2);color:#00d68f;}
   </style>
 </head>
 <body>
 
-<nav class="navbar navbar-dark px-4 py-3">
-  <a href="{% url 'landing' %}" class="navbar-brand fw-bold fs-5 text-decoration-none">📈 Dalal Street AI</a>
-  <div class="d-flex align-items-center gap-3">
-    <span class="text-white-50">👤 {{ request.user.username }}</span>
-    <span class="text-white fw-bold">₹{{ balance }}</span>
-    <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-left">
+    <a class="logo" href="{% url 'landing' %}">📈 Dalal Street <span>AI</span></a>
+    <div class="nav-tabs">
+      <a class="nav-tab active" href="{% url 'dashboard' %}">Explore</a>
+      <a class="nav-tab" href="#">Holdings</a>
+      <a class="nav-tab" href="#">Positions</a>
+      <a class="nav-tab" href="#">Orders</a>
+      <a class="nav-tab" href="#">Watchlist</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="balance-chip">Balance: <span>₹{{ balance|floatformat:0 }}</span></div>
+    <div class="user-chip">👤 {{ request.user.username }}</div>
+    <a class="btn-logout" href="{% url 'logout' %}">Logout</a>
   </div>
 </nav>
 
+<!-- INDEX BAR -->
+<div class="index-bar">
+  <div class="index-item">
+    <span class="index-name">NIFTY 50</span>
+    <span class="index-val">23,161.60</span>
+    <span class="index-chg down">▼ 53.35 (0.23%)</span>
+  </div>
+  <div class="index-item">
+    <span class="index-name">SENSEX</span>
+    <span class="index-val">73,832.55</span>
+    <span class="index-chg down">▼ 150.63 (0.20%)</span>
+  </div>
+  <div class="index-item">
+    <span class="index-name">BANKNIFTY</span>
+    <span class="index-val">55,176.75</span>
+    <span class="index-chg up">▲ 76.45 (0.14%)</span>
+  </div>
+  <div class="index-item">
+    <span class="index-name">MIDCPNIFTY</span>
+    <span class="index-val">13,866.55</span>
+    <span class="index-chg down">▼ 124.70 (0.89%)</span>
+  </div>
+  <div class="index-item">
+    <span class="index-name">FINNIFTY</span>
+    <span class="index-val">25,152.00</span>
+    <span class="index-chg down">▼ 0.00 (0.00%)</span>
+  </div>
+</div>
 
-<div class="container py-4">
-  <h5 class="fw-bold mb-3">📊 Live Market</h5>
-  <div class="row g-3">
-    {% for stock in stocks %}
-    <div class="col-md-4">
-      <div class="card stock-card shadow-sm p-3">
-        <div class="d-flex justify-content-between align-items-start">
+<div class="layout">
+  <div class="main">
+
+    <!-- GAINERS & LOSERS -->
+    <div class="movers-row">
+      <div class="movers-card">
+        <div class="movers-title">🚀 Top gainers today</div>
+        {% for stock in gainers %}
+        <div class="mover-row">
           <div>
-            <div class="fw-bold">{{ stock.symbol }}</div>
-            <div class="small text-muted">{{ stock.company_name }}</div>
+            <a class="mover-sym" href="{% url 'stock_detail' stock.symbol %}">{{ stock.symbol }}</a>
+            <div class="mover-name">{{ stock.company_name|truncatechars:28 }}</div>
           </div>
-          <span class="badge {% if stock.change_percent >= 0 %}badge-up{% else %}badge-down{% endif %} px-2 py-1">
-            {% if stock.change_percent >= 0 %}▲{% else %}▼{% endif %}
-            {{ stock.change_percent }}%
-          </span>
+          <div>
+            <div class="mover-price">₹{{ stock.current_price }}</div>
+            <div class="badge-up">▲ {{ stock.change_percent }}%</div>
+          </div>
         </div>
-        <div class="fs-4 fw-bold mt-2">₹{{ stock.current_price }}</div>
+        {% endfor %}
+      </div>
+      <div class="movers-card">
+        <div class="movers-title">📉 Top losers today</div>
+        {% for stock in losers %}
+        <div class="mover-row">
+          <div>
+            <a class="mover-sym" href="{% url 'stock_detail' stock.symbol %}">{{ stock.symbol }}</a>
+            <div class="mover-name">{{ stock.company_name|truncatechars:28 }}</div>
+          </div>
+          <div>
+            <div class="mover-price">₹{{ stock.current_price }}</div>
+            <div class="badge-down">▼ {{ stock.change_percent }}%</div>
+          </div>
+        </div>
+        {% endfor %}
       </div>
     </div>
-    {% endfor %}
+
+    <!-- SEARCH & FILTERS -->
+    <form method="GET" action="{% url 'dashboard' %}">
+      <div class="search-row">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" name="q" placeholder="Search stocks — RELIANCE, TCS, Infosys..." value="{{ search }}">
+        </div>
+        <select class="filter-select" name="sector">
+          <option value="">All sectors</option>
+          {% for s in sectors %}
+          <option value="{{ s }}" {% if s == selected_sector %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+        <select class="filter-select" name="sort">
+          <option value="symbol" {% if sort == 'symbol' %}selected{% endif %}>Sort: A-Z</option>
+          <option value="price" {% if sort == 'price' %}selected{% endif %}>Sort: Price ↓</option>
+          <option value="change" {% if sort == 'change' %}selected{% endif %}>Sort: Gainers first</option>
+          <option value="market_cap" {% if sort == 'market_cap' %}selected{% endif %}>Sort: Market cap ↓</option>
+        </select>
+        <button type="submit" class="btn-search">Search</button>
+      </div>
+    </form>
+
+    <!-- STOCKS TABLE -->
+    <div class="table-header">
+      <div class="table-title">All stocks</div>
+      <div class="result-count">{{ total_stocks }} stocks</div>
+    </div>
+    <table class="stocks-table">
+      <thead>
+        <tr>
+          <th>Company</th>
+          <th class="right">Price</th>
+          <th class="right">Change</th>
+          <th class="right">Market cap</th>
+          <th class="right">P/E</th>
+          <th class="right">52W High</th>
+          <th class="right"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for stock in stocks %}
+        <tr>
+          <td>
+            <a class="stock-sym-link" href="{% url 'stock_detail' stock.symbol %}">{{ stock.symbol }}</a>
+            <div class="stock-company">{{ stock.company_name|truncatechars:40 }}</div>
+            {% if stock.sector %}<span class="stock-sector-badge">{{ stock.sector }}</span>{% endif %}
+          </td>
+          <td class="td-right td-price">₹{{ stock.current_price }}</td>
+          <td class="td-right">
+            {% if stock.change_percent >= 0 %}
+              <span class="chg-up">▲ {{ stock.change_percent }}%</span>
+            {% else %}
+              <span class="chg-down">▼ {{ stock.change_percent|stringformat:".2f"|slice:"1:" }}%</span>
+            {% endif %}
+          </td>
+          <td class="td-right mc-val">
+            {% if stock.market_cap > 10000000000000 %}
+              ₹{{ stock.market_cap|divisibleby:10000000000 }}L Cr
+            {% elif stock.market_cap > 0 %}
+              ₹{% widthratio stock.market_cap 10000000 1 %} Cr
+            {% else %}—{% endif %}
+          </td>
+          <td class="td-right mc-val">{% if stock.pe_ratio %}{{ stock.pe_ratio }}{% else %}—{% endif %}</td>
+          <td class="td-right mc-val">{% if stock.week52_high %}₹{{ stock.week52_high }}{% else %}—{% endif %}</td>
+          <td class="td-right">
+            <a class="btn-buy" href="{% url 'stock_detail' stock.symbol %}">View →</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-title">My portfolio</div>
+      <div class="portfolio-stat"><span class="stat-key">Balance</span><span class="stat-val">₹{{ balance|floatformat:0 }}</span></div>
+      <div class="portfolio-stat"><span class="stat-key">Invested</span><span class="stat-val">—</span></div>
+      <div class="portfolio-stat"><span class="stat-key">Current value</span><span class="stat-val">—</span></div>
+      <div class="portfolio-stat"><span class="stat-key">Total P&L</span><span class="stat-val">—</span></div>
+    </div>
+
+    <div class="sidebar-card">
+      <div class="sidebar-title">Filter by sector</div>
+      <a class="sector-pill {% if not selected_sector %}active{% endif %}" href="{% url 'dashboard' %}">All</a>
+      {% for s in sectors %}
+      <a class="sector-pill {% if s == selected_sector %}active{% endif %}" href="?sector={{ s }}">{{ s }}</a>
+      {% endfor %}
+    </div>
   </div>
 </div>
 

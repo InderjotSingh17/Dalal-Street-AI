@@ -7,6 +7,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.landing, name='landing'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('stock/<str:symbol>/', views.stock_detail, name='stock_detail'),
     path('login/', auth_views.login_view, name='login'),
     path('register/', auth_views.register_view, name='register'),
     path('logout/', auth_views.logout_view, name='logout'),
