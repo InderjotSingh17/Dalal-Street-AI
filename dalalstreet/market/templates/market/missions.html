@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Missions — Dalal Street AI</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#07080f;color:#e8e8f0;font-family:'Segoe UI',sans-serif;}
+    .nav{display:flex;justify-content:space-between;align-items:center;padding:0 32px;height:56px;background:#07080f;border-bottom:0.5px solid rgba(255,255,255,0.07);position:sticky;top:0;z-index:100;}
+    .nav-left{display:flex;align-items:center;gap:32px;}
+    .logo{font-size:16px;font-weight:700;color:#fff;text-decoration:none;}
+    .logo span{color:#00d68f;}
+    .nav-tabs{display:flex;}
+    .nav-tab{padding:0 16px;height:56px;display:flex;align-items:center;font-size:14px;color:rgba(255,255,255,0.5);text-decoration:none;border-bottom:2px solid transparent;}
+    .nav-tab:hover{color:#fff;}
+    .nav-tab.active{color:#fff;border-bottom-color:#00d68f;}
+    .nav-right{display:flex;align-items:center;gap:16px;}
+    .balance-chip{background:#111520;border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 14px;font-size:13px;}
+    .balance-chip span{color:#00d68f;font-weight:700;}
+    .btn-logout{font-size:12px;padding:6px 14px;border:0.5px solid rgba(255,255,255,0.1);border-radius:7px;background:transparent;color:rgba(255,255,255,0.5);text-decoration:none;}
+    .page{max-width:900px;margin:0 auto;padding:32px;}
+    .page-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;}
+    .page-title{font-size:22px;font-weight:800;color:#fff;margin-bottom:4px;}
+    .page-sub{font-size:14px;color:rgba(255,255,255,0.4);}
+    .xp-chip{background:#0f1a14;border:0.5px solid rgba(0,214,143,0.2);border-radius:10px;padding:12px 18px;text-align:center;}
+    .xp-val{font-size:22px;font-weight:800;color:#00d68f;}
+    .xp-label{font-size:11px;color:rgba(255,255,255,0.35);margin-top:2px;}
+    .progress-row{display:flex;align-items:center;gap:12px;margin-bottom:32px;background:#0f1018;border:0.5px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px 20px;}
+    .progress-label{font-size:13px;color:rgba(255,255,255,0.5);white-space:nowrap;}
+    .progress-bar{flex:1;height:8px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;}
+    .progress-fill{height:100%;background:#00d68f;border-radius:99px;}
+    .progress-count{font-size:13px;font-weight:700;color:#fff;white-space:nowrap;}
+    .section-title{font-size:13px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;}
+    .missions-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:32px;}
+    .mission-card{display:flex;align-items:center;gap:16px;background:#0f1018;border:0.5px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px 20px;transition:border-color .2s;}
+    .mission-card.done{border-color:rgba(0,214,143,0.2);background:#0f1a14;}
+    .mission-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+    .icon-done{background:rgba(0,214,143,0.1);}
+    .icon-todo{background:rgba(255,255,255,0.05);}
+    .mission-info{flex:1;}
+    .mission-name{font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;}
+    .mission-name.done{color:#00d68f;}
+    .mission-desc{font-size:13px;color:rgba(255,255,255,0.4);}
+    .mission-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;}
+    .xp-badge{font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;}
+    .xp-badge.done{background:rgba(0,214,143,0.1);color:#00d68f;}
+    .xp-badge.todo{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.4);}
+    .check-icon{font-size:18px;}
+    .type-badge{font-size:10px;padding:2px 8px;border-radius:99px;background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.3);}
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-left">
+    <a class="logo" href="{% url 'landing' %}">📈 Dalal Street <span>AI</span></a>
+    <div class="nav-tabs">
+      <a class="nav-tab" href="{% url 'dashboard' %}">Explore</a>
+      <a class="nav-tab" href="{% url 'portfolio' %}">Holdings</a>
+      <a class="nav-tab" href="{% url 'orders' %}">Orders</a>
+      <a class="nav-tab" href="{% url 'watchlist' %}">Watchlist</a>
+      <a class="nav-tab active" href="{% url 'missions' %}">Missions</a>
+      <a class="nav-tab" href="{% url 'leaderboard' %}">Leaderboard</a>
+      <a class="nav-tab" href="{% url 'mentor' %}">Mentor</a>
+      <a class="nav-tab" href="{% url 'learn' %}">Learn</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="balance-chip">Balance: <span>₹{{ balance|floatformat:0 }}</span></div>
+    <a class="btn-logout" href="{% url 'logout' %}">Logout</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Missions</div>
+      <div class="page-sub">Complete missions to earn XP and level up faster</div>
+    </div>
+    <div class="xp-chip">
+      <div class="xp-val">{{ xp }} XP</div>
+      <div class="xp-label">{{ level_name }} · Level {{ level }}</div>
+    </div>
+  </div>
+
+  <div class="progress-row">
+    <div class="progress-label">Overall progress</div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width:{% widthratio completed_count total_count 100 %}%"></div>
+    </div>
+    <div class="progress-count">{{ completed_count }}/{{ total_count }} done</div>
+  </div>
+
+  <!-- DAILY MISSIONS -->
+  <div class="section-title">🔄 Daily missions — resets every day</div>
+  <div class="missions-grid">
+    {% for item in daily %}
+    <div class="mission-card {% if item.completed %}done{% endif %}">
+      <div class="mission-icon {% if item.completed %}icon-done{% else %}icon-todo{% endif %}">
+        {% if item.completed %}✅{% else %}🎯{% endif %}
+      </div>
+      <div class="mission-info">
+        <div class="mission-name {% if item.completed %}done{% endif %}">{{ item.mission.name }}</div>
+        <div class="mission-desc">{{ item.mission.description }}</div>
+      </div>
+      <div class="mission-right">
+        <span class="xp-badge {% if item.completed %}done{% else %}todo{% endif %}">+{{ item.mission.xp_reward }} XP</span>
+        {% if item.completed %}<span class="check-icon">✓</span>{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- ONE TIME MISSIONS -->
+  <div class="section-title">⭐ One-time achievements</div>
+  <div class="missions-grid">
+    {% for item in onetime %}
+    <div class="mission-card {% if item.completed %}done{% endif %}">
+      <div class="mission-icon {% if item.completed %}icon-done{% else %}icon-todo{% endif %}">
+        {% if item.completed %}🏆{% else %}🔒{% endif %}
+      </div>
+      <div class="mission-info">
+        <div class="mission-name {% if item.completed %}done{% endif %}">{{ item.mission.name }}</div>
+        <div class="mission-desc">{{ item.mission.description }}</div>
+      </div>
+      <div class="mission-right">
+        <span class="xp-badge {% if item.completed %}done{% else %}todo{% endif %}">+{{ item.mission.xp_reward }} XP</span>
+        {% if item.completed %}<span class="check-icon">✓</span>{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+</body>
+</html>

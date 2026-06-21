@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Leaderboard — Dalal Street AI</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#07080f;color:#e8e8f0;font-family:'Segoe UI',sans-serif;}
+    .nav{display:flex;justify-content:space-between;align-items:center;padding:0 32px;height:56px;background:#07080f;border-bottom:0.5px solid rgba(255,255,255,0.07);position:sticky;top:0;z-index:100;}
+    .nav-left{display:flex;align-items:center;gap:32px;}
+    .logo{font-size:16px;font-weight:700;color:#fff;text-decoration:none;}
+    .logo span{color:#00d68f;}
+    .nav-tabs{display:flex;}
+    .nav-tab{padding:0 16px;height:56px;display:flex;align-items:center;font-size:14px;color:rgba(255,255,255,0.5);text-decoration:none;border-bottom:2px solid transparent;}
+    .nav-tab:hover{color:#fff;}
+    .nav-tab.active{color:#fff;border-bottom-color:#00d68f;}
+    .nav-right{display:flex;align-items:center;gap:16px;}
+    .balance-chip{background:#111520;border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 14px;font-size:13px;}
+    .balance-chip span{color:#00d68f;font-weight:700;}
+    .btn-logout{font-size:12px;padding:6px 14px;border:0.5px solid rgba(255,255,255,0.1);border-radius:7px;background:transparent;color:rgba(255,255,255,0.5);text-decoration:none;}
+    .page{max-width:900px;margin:0 auto;padding:32px;}
+    .page-header{margin-bottom:28px;}
+    .page-title{font-size:22px;font-weight:800;color:#fff;margin-bottom:4px;}
+    .page-sub{font-size:14px;color:rgba(255,255,255,0.4);}
+
+    /* YOUR RANK CARD */
+    .rank-card{background:linear-gradient(135deg,#0f1a14,#0f1018);border:0.5px solid rgba(0,214,143,0.2);border-radius:14px;padding:20px 24px;margin-bottom:28px;display:flex;align-items:center;gap:20px;}
+    .rank-num{font-size:40px;font-weight:800;color:#00d68f;min-width:60px;}
+    .rank-info h3{font-size:16px;font-weight:700;color:#fff;margin-bottom:3px;}
+    .rank-info p{font-size:13px;color:rgba(255,255,255,0.4);}
+    .rank-stats{margin-left:auto;display:flex;gap:24px;}
+    .rank-stat{text-align:center;}
+    .rank-stat-val{font-size:16px;font-weight:700;color:#fff;}
+    .rank-stat-val.up{color:#00d68f;}
+    .rank-stat-val.down{color:#ff6b6b;}
+    .rank-stat-label{font-size:11px;color:rgba(255,255,255,0.35);margin-top:2px;}
+
+    /* TOP 3 */
+    .top3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:28px;}
+    .top-card{background:#0f1018;border:0.5px solid rgba(255,255,255,0.07);border-radius:14px;padding:20px;text-align:center;}
+    .top-card.gold{border-color:rgba(245,197,24,0.3);background:rgba(245,197,24,0.04);}
+    .top-card.silver{border-color:rgba(170,170,170,0.3);background:rgba(170,170,170,0.04);}
+    .top-card.bronze{border-color:rgba(205,127,50,0.3);background:rgba(205,127,50,0.04);}
+    .top-medal{font-size:32px;margin-bottom:10px;}
+    .top-avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#07080f;margin:0 auto 10px;}
+    .avatar-gold{background:#f5c518;}
+    .avatar-silver{background:#aaa;}
+    .avatar-bronze{background:#cd7f32;}
+    .avatar-default{background:#00d68f;}
+    .top-name{font-size:14px;font-weight:700;color:#fff;margin-bottom:3px;}
+    .top-level{font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:10px;}
+    .top-portfolio{font-size:18px;font-weight:800;color:#fff;}
+    .top-pnl{font-size:12px;margin-top:3px;}
+    .up{color:#00d68f;font-weight:600;}
+    .down{color:#ff6b6b;font-weight:600;}
+
+    /* TABLE */
+    .lb-table{width:100%;border-collapse:collapse;}
+    .lb-table th{padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:.05em;border-bottom:0.5px solid rgba(255,255,255,0.07);}
+    .lb-table th.right{text-align:right;}
+    .lb-table td{padding:14px;border-bottom:0.5px solid rgba(255,255,255,0.04);font-size:14px;}
+    .lb-table tr:hover td{background:rgba(255,255,255,0.02);}
+    .lb-table tr.me td{background:rgba(0,214,143,0.04);}
+    .td-right{text-align:right;}
+    .rank-badge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;font-size:12px;font-weight:700;}
+    .rank-1{background:rgba(245,197,24,0.15);color:#f5c518;}
+    .rank-2{background:rgba(170,170,170,0.15);color:#aaa;}
+    .rank-3{background:rgba(205,127,50,0.15);color:#cd7f32;}
+    .rank-other{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.4);}
+    .user-name{font-weight:700;color:#fff;}
+    .user-level{font-size:11px;color:rgba(255,255,255,0.35);margin-top:2px;}
+    .xp-val{font-size:13px;color:rgba(255,255,255,0.5);}
+    .empty-state{text-align:center;padding:60px 20px;color:rgba(255,255,255,0.3);}
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-left">
+    <a class="logo" href="{% url 'landing' %}">📈 Dalal Street <span>AI</span></a>
+    <div class="nav-tabs">
+      <a class="nav-tab" href="{% url 'dashboard' %}">Explore</a>
+      <a class="nav-tab" href="{% url 'portfolio' %}">Holdings</a>
+      <a class="nav-tab" href="{% url 'orders' %}">Orders</a>
+      <a class="nav-tab" href="{% url 'watchlist' %}">Watchlist</a>
+      <a class="nav-tab" href="{% url 'missions' %}">Missions</a>
+      <a class="nav-tab active" href="{% url 'leaderboard' %}">Leaderboard</a>
+      <a class="nav-tab" href="{% url 'mentor' %}">Mentor</a>
+      <a class="nav-tab" href="{% url 'learn' %}">Learn</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="balance-chip">Balance: <span>₹{{ balance|floatformat:0 }}</span></div>
+    <a class="btn-logout" href="{% url 'logout' %}">Logout</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <div class="page-title">🏆 Leaderboard</div>
+    <div class="page-sub">Ranked by total portfolio value — balance + current holdings</div>
+  </div>
+
+  <!-- YOUR RANK -->
+  {% if user_rank %}
+  <div class="rank-card">
+    <div class="rank-num">#{{ user_rank }}</div>
+    <div class="rank-info">
+      <h3>{{ request.user.username }}</h3>
+      <p>{{ my_profile.level_name }} · Level {{ my_profile.level }} · {{ my_profile.xp }} XP</p>
+    </div>
+    <div class="rank-stats">
+      <div class="rank-stat">
+        <div class="rank-stat-val">₹{{ balance|floatformat:0 }}</div>
+        <div class="rank-stat-label">Cash balance</div>
+      </div>
+      <div class="rank-stat">
+        <div class="rank-stat-val">{{ my_profile.xp }}</div>
+        <div class="rank-stat-label">Total XP</div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- TOP 3 -->
+  {% if leaderboard|length >= 3 %}
+  <div class="top3">
+    {% with leaderboard.1 as second %}
+    <div class="top-card silver">
+      <div class="top-medal">🥈</div>
+      <div class="top-avatar avatar-silver">{{ second.user.username|first|upper }}</div>
+      <div class="top-name">{{ second.user.username }}</div>
+      <div class="top-level">{{ second.level_name }}</div>
+      <div class="top-portfolio">₹{{ second.total_portfolio|floatformat:0 }}</div>
+      <div class="top-pnl {% if second.total_pnl >= 0 %}up{% else %}down{% endif %}">
+        {% if second.total_pnl >= 0 %}+{% endif %}₹{{ second.total_pnl|floatformat:0 }}
+      </div>
+    </div>
+    {% endwith %}
+    {% with leaderboard.0 as first %}
+    <div class="top-card gold">
+      <div class="top-medal">🥇</div>
+      <div class="top-avatar avatar-gold">{{ first.user.username|first|upper }}</div>
+      <div class="top-name">{{ first.user.username }}</div>
+      <div class="top-level">{{ first.level_name }}</div>
+      <div class="top-portfolio">₹{{ first.total_portfolio|floatformat:0 }}</div>
+      <div class="top-pnl {% if first.total_pnl >= 0 %}up{% else %}down{% endif %}">
+        {% if first.total_pnl >= 0 %}+{% endif %}₹{{ first.total_pnl|floatformat:0 }}
+      </div>
+    </div>
+    {% endwith %}
+    {% with leaderboard.2 as third %}
+    <div class="top-card bronze">
+      <div class="top-medal">🥉</div>
+      <div class="top-avatar avatar-bronze">{{ third.user.username|first|upper }}</div>
+      <div class="top-name">{{ third.user.username }}</div>
+      <div class="top-level">{{ third.level_name }}</div>
+      <div class="top-portfolio">₹{{ third.total_portfolio|floatformat:0 }}</div>
+      <div class="top-pnl {% if third.total_pnl >= 0 %}up{% else %}down{% endif %}">
+        {% if third.total_pnl >= 0 %}+{% endif %}₹{{ third.total_pnl|floatformat:0 }}
+      </div>
+    </div>
+    {% endwith %}
+  </div>
+  {% endif %}
+
+  <!-- FULL TABLE -->
+  {% if leaderboard %}
+  <table class="lb-table">
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>Investor</th>
+        <th class="right">Portfolio value</th>
+        <th class="right">P&L</th>
+        <th class="right">Trades</th>
+        <th class="right">XP</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in leaderboard %}
+      <tr {% if entry.user == request.user %}class="me"{% endif %}>
+        <td>
+          <span class="rank-badge
+            {% if forloop.counter == 1 %}rank-1
+            {% elif forloop.counter == 2 %}rank-2
+            {% elif forloop.counter == 3 %}rank-3
+            {% else %}rank-other{% endif %}">
+            {{ forloop.counter }}
+          </span>
+        </td>
+        <td>
+          <div class="user-name">
+            {{ entry.user.username }}
+            {% if entry.user == request.user %}<span style="font-size:11px;color:#00d68f;margin-left:6px;">· You</span>{% endif %}
+          </div>
+          <div class="user-level">{{ entry.level_name }} · Level {{ entry.level }}</div>
+        </td>
+        <td class="td-right" style="font-weight:700;color:#fff;">₹{{ entry.total_portfolio|floatformat:0 }}</td>
+        <td class="td-right {% if entry.total_pnl >= 0 %}up{% else %}down{% endif %}">
+          {% if entry.total_pnl >= 0 %}+{% endif %}₹{{ entry.total_pnl|floatformat:0 }}
+          <div style="font-size:11px;">{% if entry.total_pnl_pct >= 0 %}+{% endif %}{{ entry.total_pnl_pct|floatformat:2 }}%</div>
+        </td>
+        <td class="td-right xp-val">{{ entry.total_trades }}</td>
+        <td class="td-right xp-val">{{ entry.xp }} XP</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">
+    <div style="font-size:48px;margin-bottom:16px;">🏆</div>
+    <div style="font-size:18px;font-weight:600;color:rgba(255,255,255,0.5);margin-bottom:8px;">No investors yet</div>
+    <p>Be the first to make a trade and top the leaderboard!</p>
+  </div>
+  {% endif %}
+</div>
+
+</body>
+</html>

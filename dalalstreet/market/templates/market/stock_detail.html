@@ -100,6 +100,17 @@
 </head>
 <body>
 
+{% if coaching_tip %}
+<div id="coachingBanner" style="background:linear-gradient(135deg,#0f1a14,#0f1820);border-bottom:0.5px solid rgba(0,214,143,0.2);padding:14px 32px;display:flex;align-items:center;gap:14px;">
+  <span style="font-size:22px;">🤖</span>
+  <div style="flex:1;">
+    <div style="font-size:12px;font-weight:700;color:#00d68f;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;">Mentor tip</div>
+    <div style="font-size:14px;color:rgba(255,255,255,0.7);line-height:1.5;">{{ coaching_tip }}</div>
+  </div>
+  <span onclick="document.getElementById('coachingBanner').style.display='none'" style="cursor:pointer;color:rgba(255,255,255,0.3);font-size:18px;padding:4px;">✕</span>
+</div>
+{% endif %}
+
 <!-- NAV -->
 <nav class="nav">
   <div class="nav-left">
@@ -138,6 +149,10 @@
         {% endif %}
       </div>
       <div class="price-meta">Prev close ₹{{ stock.previous_close }} &nbsp;·&nbsp; Open ₹{{ stock.open_price }} &nbsp;·&nbsp; Vol {{ stock.volume|default:"—" }}</div>
+      <a href="{% url 'toggle_watchlist' stock.symbol %}" style="display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:7px 16px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;
+      {% if in_watchlist %}background:rgba(0,214,143,0.1);color:#00d68f;border:0.5px solid rgba(0,214,143,0.2);{% else %}background:#111520;color:rgba(255,255,255,0.5);border:0.5px solid rgba(255,255,255,0.1);{% endif %}">
+        {% if in_watchlist %}★ Watchlisted{% else %}☆ Add to watchlist{% endif %}
+      </a>
     </div>
 
     <!-- CHART TABS -->
@@ -252,7 +267,95 @@
         </div>
       </div>
     </div>
+    <!-- CONCEPT EXPLAINERS -->
+<div class="section-title" style="margin-top:24px;">📚 Understanding the fundamentals</div>
+<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px;">
 
+  {% if stock.pe_ratio %}
+  <div style="background:#0f1018;border:0.5px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px 16px;cursor:pointer;" onclick="toggleExplainer('pe')">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-size:14px;font-weight:600;color:#fff;">P/E Ratio — {{ stock.pe_ratio }}</div>
+      <span style="color:rgba(255,255,255,0.3);font-size:16px;" id="pe-icon">+</span>
+    </div>
+    <div id="pe-body" style="display:none;margin-top:10px;font-size:13px;color:rgba(255,255,255,0.5);line-height:1.7;">
+      <strong style="color:#00d68f;">What is P/E ratio?</strong> It compares the stock price to the company's earnings per share. A P/E of {{ stock.pe_ratio }} means investors are paying ₹{{ stock.pe_ratio }} for every ₹1 of profit the company makes.
+      {% if stock.pe_ratio > 40 %}<br><br>⚠️ <strong style="color:#ffc107;">High P/E alert:</strong> A P/E above 40 suggests the market expects very strong future growth. If that growth doesn't happen, the stock could fall significantly.
+      {% elif stock.pe_ratio < 15 %}<br><br>✅ <strong style="color:#00d68f;">Low P/E:</strong> This could mean the stock is undervalued — or the market expects slower growth. Always research why before buying.
+      {% else %}<br><br>✅ <strong style="color:#00d68f;">Moderate P/E:</strong> This is within a reasonable range for most sectors.{% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if stock.eps %}
+  <div style="background:#0f1018;border:0.5px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px 16px;cursor:pointer;" onclick="toggleExplainer('eps')">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-size:14px;font-weight:600;color:#fff;">EPS — ₹{{ stock.eps }}</div>
+      <span style="color:rgba(255,255,255,0.3);font-size:16px;" id="eps-icon">+</span>
+    </div>
+    <div id="eps-body" style="display:none;margin-top:10px;font-size:13px;color:rgba(255,255,255,0.5);line-height:1.7;">
+      <strong style="color:#00d68f;">What is EPS?</strong> Earnings Per Share — the profit the company made divided by total shares. {{ stock.company_name }} earned ₹{{ stock.eps }} per share. Higher EPS generally means a more profitable company. Consistent EPS growth over years is a sign of a healthy business.
+    </div>
+  </div>
+  {% endif %}
+
+  {% if stock.roe %}
+  <div style="background:#0f1018;border:0.5px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px 16px;cursor:pointer;" onclick="toggleExplainer('roe')">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-size:14px;font-weight:600;color:#fff;">ROE — {{ stock.roe }}%</div>
+      <span style="color:rgba(255,255,255,0.3);font-size:16px;" id="roe-icon">+</span>
+    </div>
+    <div id="roe-body" style="display:none;margin-top:10px;font-size:13px;color:rgba(255,255,255,0.5);line-height:1.7;">
+      <strong style="color:#00d68f;">What is ROE?</strong> Return on Equity — how efficiently the company uses shareholders' money to generate profit. An ROE of {{ stock.roe }}% means for every ₹100 of shareholder money, the company generates ₹{{ stock.roe }} in profit.
+      {% if stock.roe > 20 %}<br><br>✅ <strong style="color:#00d68f;">Excellent ROE:</strong> Above 20% is considered strong. This company is using capital very efficiently.
+      {% elif stock.roe > 12 %}<br><br>✅ <strong style="color:#00d68f;">Good ROE:</strong> Between 12-20% is healthy for most industries.
+      {% else %}<br><br>⚠️ <strong style="color:#ffc107;">Low ROE:</strong> Below 12% may indicate the company is not generating strong returns on investment.{% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if stock.pb_ratio %}
+  <div style="background:#0f1018;border:0.5px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px 16px;cursor:pointer;" onclick="toggleExplainer('pb')">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-size:14px;font-weight:600;color:#fff;">P/B Ratio — {{ stock.pb_ratio }}</div>
+      <span style="color:rgba(255,255,255,0.3);font-size:16px;" id="pb-icon">+</span>
+    </div>
+    <div id="pb-body" style="display:none;margin-top:10px;font-size:13px;color:rgba(255,255,255,0.5);line-height:1.7;">
+      <strong style="color:#00d68f;">What is P/B ratio?</strong> Price to Book ratio compares the stock price to the company's book value (assets minus liabilities). A P/B of {{ stock.pb_ratio }} means you are paying ₹{{ stock.pb_ratio }} for every ₹1 of the company's net assets.
+      {% if stock.pb_ratio < 1 %}<br><br>✅ <strong style="color:#00d68f;">Below book value:</strong> The stock trades below its asset value — could be undervalued or the market has concerns.
+      {% elif stock.pb_ratio > 5 %}<br><br>⚠️ <strong style="color:#ffc107;">High P/B:</strong> The market values this company much higher than its assets — usually justified by strong brand, earnings or growth expectations.{% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if stock.debt_to_equity %}
+  <div style="background:#0f1018;border:0.5px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px 16px;cursor:pointer;" onclick="toggleExplainer('de')">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-size:14px;font-weight:600;color:#fff;">Debt to Equity — {{ stock.debt_to_equity }}</div>
+      <span style="color:rgba(255,255,255,0.3);font-size:16px;" id="de-icon">+</span>
+    </div>
+    <div id="de-body" style="display:none;margin-top:10px;font-size:13px;color:rgba(255,255,255,0.5);line-height:1.7;">
+      <strong style="color:#00d68f;">What is Debt to Equity?</strong> It shows how much debt the company has compared to shareholder equity. A ratio of {{ stock.debt_to_equity }} means for every ₹1 of equity, the company has ₹{{ stock.debt_to_equity }} of debt.
+      {% if stock.debt_to_equity < 0.5 %}<br><br>✅ <strong style="color:#00d68f;">Low debt:</strong> This company has very little debt — financially stable and lower risk.
+      {% elif stock.debt_to_equity > 2 %}<br><br>⚠️ <strong style="color:#ff6b6b;">High debt:</strong> High debt increases financial risk, especially during economic downturns. Check if the company generates enough cash to service its debt.{% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <div style="background:#0f1018;border:0.5px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px 16px;cursor:pointer;" onclick="toggleExplainer('mc')">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-size:14px;font-weight:600;color:#fff;">Market Cap — {% if stock.market_cap %}₹{% widthratio stock.market_cap 10000000 1 %} Cr{% else %}—{% endif %}</div>
+      <span style="color:rgba(255,255,255,0.3);font-size:16px;" id="mc-icon">+</span>
+    </div>
+    <div id="mc-body" style="display:none;margin-top:10px;font-size:13px;color:rgba(255,255,255,0.5);line-height:1.7;">
+      <strong style="color:#00d68f;">What is Market Cap?</strong> Total value of all shares — price × total shares. It tells you the size of the company.
+      <br><br>
+      🔵 <strong style="color:#fff;">Large cap (₹20,000 Cr+):</strong> Stable, established companies. Lower risk, steady returns.<br>
+      🟡 <strong style="color:#fff;">Mid cap (₹5,000–20,000 Cr):</strong> Growing companies. Higher potential, moderate risk.<br>
+      🔴 <strong style="color:#fff;">Small cap (below ₹5,000 Cr):</strong> Early stage or niche companies. High risk, high reward potential.
+    </div>
+  </div>
+
+</div>
   </div>
 
   <!-- BUY/SELL PANEL -->
@@ -391,6 +494,17 @@
   window.addEventListener('resize', () => {
     chart.applyOptions({ width: document.getElementById('chart').offsetWidth });
   });
+  function toggleExplainer(id) {
+    const body = document.getElementById(id + '-body');
+    const icon = document.getElementById(id + '-icon');
+    if (body.style.display === 'none') {
+        body.style.display = 'block';
+        icon.textContent = '−';
+    } else {
+        body.style.display = 'none';
+        icon.textContent = '+';
+    }
+  }
 </script>
 </body>
 </html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Watchlist — Dalal Street AI</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#07080f;color:#e8e8f0;font-family:'Segoe UI',sans-serif;}
+    .nav{display:flex;justify-content:space-between;align-items:center;padding:0 32px;height:56px;background:#07080f;border-bottom:0.5px solid rgba(255,255,255,0.07);position:sticky;top:0;z-index:100;}
+    .nav-left{display:flex;align-items:center;gap:32px;}
+    .logo{font-size:16px;font-weight:700;color:#fff;text-decoration:none;}
+    .logo span{color:#00d68f;}
+    .nav-tabs{display:flex;}
+    .nav-tab{padding:0 16px;height:56px;display:flex;align-items:center;font-size:14px;color:rgba(255,255,255,0.5);text-decoration:none;border-bottom:2px solid transparent;}
+    .nav-tab:hover{color:#fff;}
+    .nav-tab.active{color:#fff;border-bottom-color:#00d68f;}
+    .nav-right{display:flex;align-items:center;gap:16px;}
+    .balance-chip{background:#111520;border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 14px;font-size:13px;}
+    .balance-chip span{color:#00d68f;font-weight:700;}
+    .btn-logout{font-size:12px;padding:6px 14px;border:0.5px solid rgba(255,255,255,0.1);border-radius:7px;background:transparent;color:rgba(255,255,255,0.5);text-decoration:none;}
+    .page{max-width:1000px;margin:0 auto;padding:32px;}
+    .page-title{font-size:22px;font-weight:800;color:#fff;margin-bottom:24px;}
+    .watch-table{width:100%;border-collapse:collapse;}
+    .watch-table th{padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:.05em;border-bottom:0.5px solid rgba(255,255,255,0.07);}
+    .watch-table th.right{text-align:right;}
+    .watch-table td{padding:14px;border-bottom:0.5px solid rgba(255,255,255,0.04);font-size:14px;}
+    .watch-table tr:hover td{background:rgba(255,255,255,0.02);}
+    .stock-sym{font-weight:700;color:#fff;text-decoration:none;}
+    .stock-sym:hover{color:#00d68f;}
+    .stock-name{font-size:12px;color:rgba(255,255,255,0.35);margin-top:2px;}
+    .td-right{text-align:right;}
+    .up{color:#00d68f;font-weight:600;}
+    .down{color:#ff6b6b;font-weight:600;}
+    .btn-view{padding:5px 14px;background:rgba(0,214,143,0.1);color:#00d68f;border:0.5px solid rgba(0,214,143,0.2);border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;}
+    .btn-remove{padding:5px 14px;background:rgba(255,107,107,0.08);color:#ff6b6b;border:0.5px solid rgba(255,107,107,0.15);border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;margin-left:6px;}
+    .empty-state{text-align:center;padding:80px 20px;color:rgba(255,255,255,0.3);}
+    .empty-icon{font-size:48px;margin-bottom:16px;}
+    .empty-title{font-size:18px;font-weight:600;color:rgba(255,255,255,0.5);margin-bottom:8px;}
+    .btn-explore{display:inline-block;margin-top:20px;padding:12px 24px;background:#00d68f;color:#07080f;font-size:14px;font-weight:700;border-radius:10px;text-decoration:none;}
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-left">
+    <a class="logo" href="{% url 'landing' %}">📈 Dalal Street <span>AI</span></a>
+    <div class="nav-tabs">
+      <a class="nav-tab" href="{% url 'dashboard' %}">Explore</a>
+      <a class="nav-tab" href="{% url 'portfolio' %}">Holdings</a>
+      <a class="nav-tab" href="{% url 'orders' %}">Orders</a>
+      <a class="nav-tab active" href="{% url 'watchlist' %}">Watchlist</a>
+      <a class="nav-tab" href="{% url 'missions' %}">Missions</a>
+      <a class="nav-tab" href="{% url 'leaderboard' %}">Leaderboard</a>
+      <a class="nav-tab" href="{% url 'mentor' %}">Mentor</a>
+      <a class="nav-tab" href="{% url 'learn' %}">Learn</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="balance-chip">Balance: <span>₹{{ balance|floatformat:0 }}</span></div>
+    <a class="btn-logout" href="{% url 'logout' %}">Logout</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-title">My Watchlist</div>
+
+  {% if items %}
+  <table class="watch-table">
+    <thead>
+      <tr>
+        <th>Stock</th>
+        <th class="right">Price</th>
+        <th class="right">Change</th>
+        <th class="right">Market cap</th>
+        <th class="right">P/E</th>
+        <th class="right">Added</th>
+        <th class="right"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td>
+          <a class="stock-sym" href="{% url 'stock_detail' item.stock.symbol %}">{{ item.stock.symbol }}</a>
+          <div class="stock-name">{{ item.stock.company_name|truncatechars:35 }}</div>
+        </td>
+        <td class="td-right">₹{{ item.stock.current_price }}</td>
+        <td class="td-right">
+          {% if item.stock.change_percent >= 0 %}
+            <span class="up">▲ {{ item.stock.change_percent }}%</span>
+          {% else %}
+            <span class="down">▼ {{ item.stock.change_percent|stringformat:".2f"|slice:"1:" }}%</span>
+          {% endif %}
+        </td>
+        <td class="td-right" style="font-size:13px;color:rgba(255,255,255,0.5);">
+          {% if item.stock.market_cap %}₹{% widthratio item.stock.market_cap 10000000 1 %} Cr{% else %}—{% endif %}
+        </td>
+        <td class="td-right" style="font-size:13px;color:rgba(255,255,255,0.5);">{{ item.stock.pe_ratio|default:"—" }}</td>
+        <td class="td-right" style="font-size:12px;color:rgba(255,255,255,0.35);">{{ item.added_on|date:"d M Y" }}</td>
+        <td class="td-right">
+          <a class="btn-view" href="{% url 'stock_detail' item.stock.symbol %}">View</a>
+          <a class="btn-remove" href="{% url 'toggle_watchlist' item.stock.symbol %}">Remove</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">⭐</div>
+    <div class="empty-title">Your watchlist is empty</div>
+    <p>Add stocks to your watchlist by clicking "Add to watchlist" on any stock page.</p>
+    <a class="btn-explore" href="{% url 'dashboard' %}">Explore stocks →</a>
+  </div>
+  {% endif %}
+</div>
+
+</body>
+</html>

@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Learn — Dalal Street AI</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#07080f;color:#e8e8f0;font-family:'Segoe UI',sans-serif;}
+    .nav{display:flex;justify-content:space-between;align-items:center;padding:0 32px;height:56px;background:#07080f;border-bottom:0.5px solid rgba(255,255,255,0.07);position:sticky;top:0;z-index:100;}
+    .nav-left{display:flex;align-items:center;gap:32px;}
+    .logo{font-size:16px;font-weight:700;color:#fff;text-decoration:none;}
+    .logo span{color:#00d68f;}
+    .nav-tabs{display:flex;}
+    .nav-tab{padding:0 16px;height:56px;display:flex;align-items:center;font-size:14px;color:rgba(255,255,255,0.5);text-decoration:none;border-bottom:2px solid transparent;}
+    .nav-tab:hover{color:#fff;}
+    .nav-tab.active{color:#fff;border-bottom-color:#00d68f;}
+    .nav-right{display:flex;align-items:center;gap:16px;}
+    .balance-chip{background:#111520;border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 14px;font-size:13px;}
+    .balance-chip span{color:#00d68f;font-weight:700;}
+    .btn-logout{font-size:12px;padding:6px 14px;border:0.5px solid rgba(255,255,255,0.1);border-radius:7px;background:transparent;color:rgba(255,255,255,0.5);text-decoration:none;}
+    .page{max-width:900px;margin:0 auto;padding:32px;}
+    .page-title{font-size:22px;font-weight:800;color:#fff;margin-bottom:4px;}
+    .page-sub{font-size:14px;color:rgba(255,255,255,0.4);margin-bottom:32px;}
+
+    .modules-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:40px;}
+    .module-card{background:#0f1018;border:0.5px solid rgba(255,255,255,0.07);border-radius:14px;padding:20px;cursor:pointer;transition:border-color .2s;}
+    .module-card:hover{border-color:rgba(0,214,143,0.3);}
+    .module-card.active{border-color:#00d68f;background:#0f1a14;}
+    .module-icon{font-size:28px;margin-bottom:12px;}
+    .module-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;}
+    .module-count{font-size:12px;color:rgba(255,255,255,0.35);}
+
+    .lesson-area{background:#0f1018;border:0.5px solid rgba(255,255,255,0.07);border-radius:14px;padding:28px;display:none;}
+    .lesson-area.visible{display:block;}
+    .lesson-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+    .lesson-title{font-size:18px;font-weight:800;color:#fff;}
+    .lesson-nav{display:flex;gap:8px;}
+    .btn-nav{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;}
+    .btn-prev{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5);}
+    .btn-next{background:#00d68f;color:#07080f;}
+    .lesson-progress{height:3px;background:rgba(255,255,255,0.08);border-radius:99px;margin-bottom:24px;overflow:hidden;}
+    .lesson-progress-fill{height:100%;background:#00d68f;border-radius:99px;transition:width .3s;}
+    .lesson-content{font-size:15px;color:rgba(255,255,255,0.7);line-height:1.8;}
+    .lesson-content h3{font-size:16px;font-weight:700;color:#fff;margin:18px 0 8px;}
+    .lesson-content p{margin-bottom:14px;}
+    .lesson-content .highlight{background:rgba(0,214,143,0.08);border:0.5px solid rgba(0,214,143,0.15);border-radius:8px;padding:14px 16px;margin:14px 0;font-size:14px;color:rgba(255,255,255,0.8);}
+    .lesson-content .example{background:#111520;border-radius:8px;padding:14px 16px;margin:14px 0;font-size:14px;color:rgba(255,255,255,0.6);border-left:3px solid #00d68f;}
+    .lesson-content .warning{background:rgba(255,193,7,0.06);border:0.5px solid rgba(255,193,7,0.15);border-radius:8px;padding:14px 16px;margin:14px 0;font-size:14px;color:rgba(255,255,255,0.7);}
+    .lesson-counter{font-size:12px;color:rgba(255,255,255,0.35);}
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-left">
+    <a class="logo" href="{% url 'landing' %}">📈 Dalal Street <span>AI</span></a>
+    <div class="nav-tabs">
+      <a class="nav-tab" href="{% url 'dashboard' %}">Explore</a>
+      <a class="nav-tab" href="{% url 'portfolio' %}">Holdings</a>
+      <a class="nav-tab" href="{% url 'orders' %}">Orders</a>
+      <a class="nav-tab" href="{% url 'watchlist' %}">Watchlist</a>
+      <a class="nav-tab" href="{% url 'missions' %}">Missions</a>
+      <a class="nav-tab" href="{% url 'leaderboard' %}">Leaderboard</a>
+      <a class="nav-tab" href="{% url 'mentor' %}">Mentor</a>
+      <a class="nav-tab active" href="{% url 'learn' %}">Learn</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="balance-chip">Balance: <span>₹{{ balance|floatformat:0 }}</span></div>
+    <a class="btn-logout" href="{% url 'logout' %}">Logout</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-title">📚 Learn Investing</div>
+  <div class="page-sub">Bite-sized lessons to make you a confident investor</div>
+
+  <div class="modules-grid">
+    <div class="module-card active" onclick="loadModule(0)">
+      <div class="module-icon">🏦</div>
+      <div class="module-title">Stock Market Basics</div>
+      <div class="module-count">5 lessons</div>
+    </div>
+    <div class="module-card" onclick="loadModule(1)">
+      <div class="module-icon">📊</div>
+      <div class="module-title">Reading Fundamentals</div>
+      <div class="module-count">5 lessons</div>
+    </div>
+    <div class="module-card" onclick="loadModule(2)">
+      <div class="module-icon">🧠</div>
+      <div class="module-title">Investor Psychology</div>
+      <div class="module-count">4 lessons</div>
+    </div>
+    <div class="module-card" onclick="loadModule(3)">
+      <div class="module-icon">💼</div>
+      <div class="module-title">Portfolio Strategy</div>
+      <div class="module-count">4 lessons</div>
+    </div>
+    <div class="module-card" onclick="loadModule(4)">
+      <div class="module-icon">📈</div>
+      <div class="module-title">Bull & Bear Markets</div>
+      <div class="module-count">3 lessons</div>
+    </div>
+    <div class="module-card" onclick="loadModule(5)">
+      <div class="module-icon">🇮🇳</div>
+      <div class="module-title">Indian Market Indices</div>
+      <div class="module-count">3 lessons</div>
+    </div>
+  </div>
+
+  <div class="lesson-area visible" id="lessonArea">
+    <div class="lesson-header">
+      <div>
+        <div class="lesson-title" id="lessonTitle">What is a stock?</div>
+        <div class="lesson-counter" id="lessonCounter">Lesson 1 of 5</div>
+      </div>
+      <div class="lesson-nav">
+        <button class="btn-nav btn-prev" onclick="prevLesson()">← Prev</button>
+        <button class="btn-nav btn-next" onclick="nextLesson()">Next →</button>
+      </div>
+    </div>
+    <div class="lesson-progress">
+      <div class="lesson-progress-fill" id="progressFill" style="width:20%"></div>
+    </div>
+    <div class="lesson-content" id="lessonContent"></div>
+  </div>
+</div>
+
+<script>
+const modules = [
+  {
+    title: 'Stock Market Basics',
+    lessons: [
+      {
+        title: 'What is a stock?',
+        content: `
+          <p>When a company wants to raise money to grow, it can sell small pieces of ownership to the public. These pieces are called <strong>stocks</strong> or <strong>shares</strong>.</p>
+          <div class="highlight">💡 If a company has 1,00,000 shares and you buy 1,000 of them — you own 1% of that company.</div>
+          <p>As a shareholder, you benefit when the company grows. If Reliance Industries earns more profit, the value of your Reliance shares goes up.</p>
+          <div class="example">🇮🇳 Example: Tata Consultancy Services (TCS) has millions of shares trading on the NSE. When TCS wins a big contract, its share price often rises because investors expect higher profits.</div>
+          <p>Stocks are different from Fixed Deposits — they carry risk but also offer much higher long-term returns.</p>
+        `
+      },
+      {
+        title: 'Why do stock prices move?',
+        content: `
+          <p>Stock prices move because of <strong>supply and demand</strong>. When more people want to buy a stock than sell it, the price goes up. When more want to sell, it goes down.</p>
+          <h3>What drives demand?</h3>
+          <p>Demand for a stock changes based on:</p>
+          <div class="highlight">📈 Strong quarterly results → More buyers → Price rises<br>📉 Disappointing earnings → More sellers → Price falls</div>
+          <p>But prices also move based on <strong>expectations</strong>, not just current results. If investors believe TCS will win more contracts next year, they buy today — pushing the price up now.</p>
+          <div class="example">🇮🇳 Example: When RBI raises interest rates, bank stocks often rise because banks can earn more on loans. This is market expectation at work.</div>
+        `
+      },
+      {
+        title: 'What is the NSE?',
+        content: `
+          <p>The <strong>National Stock Exchange (NSE)</strong> is where buyers and sellers of stocks meet. It is India's largest stock exchange by trading volume.</p>
+          <div class="highlight">🏛️ NSE is like a marketplace — but instead of vegetables or clothes, people buy and sell shares of companies.</div>
+          <h3>How does it work?</h3>
+          <p>When you place a buy order for HDFC Bank on Zerodha or Groww, your order goes to the NSE. There, it gets matched with someone who wants to sell HDFC Bank shares at your price.</p>
+          <p>Trading happens Monday to Friday, 9:15 AM to 3:30 PM IST. Outside these hours, prices don't change — which is why Dalal Street AI prices update during market hours.</p>
+          <div class="example">🇮🇳 India also has BSE (Bombay Stock Exchange) — the oldest in Asia. Most large stocks trade on both exchanges.</div>
+        `
+      },
+      {
+        title: 'What is a portfolio?',
+        content: `
+          <p>A <strong>portfolio</strong> is the collection of all investments you own. On Dalal Street AI, your portfolio includes all the stocks you have bought.</p>
+          <div class="highlight">💼 Portfolio = All your stocks + Cash balance</div>
+          <h3>Why does portfolio composition matter?</h3>
+          <p>If you put all your money in one stock and that company has a bad quarter — your entire portfolio suffers. Spreading across multiple stocks reduces this risk.</p>
+          <div class="example">🇮🇳 Example: If you own RELIANCE, TCS and HDFCBANK — and Reliance falls 10%, your total portfolio drops only about 3.3% (assuming equal allocation). That is diversification at work.</div>
+          <div class="warning">⚠️ Warren Buffett says: "Do not put all your eggs in one basket." This is the most fundamental rule of investing.</div>
+        `
+      },
+      {
+        title: 'How do you make money from stocks?',
+        content: `
+          <p>There are two ways to make money from stocks:</p>
+          <h3>1. Capital appreciation</h3>
+          <p>You buy a stock at ₹100 and sell it later at ₹150. You made ₹50 profit per share. This is the most common way.</p>
+          <h3>2. Dividends</h3>
+          <p>Some companies share their profits with shareholders as <strong>dividends</strong> — cash payments per share you own.</p>
+          <div class="highlight">💰 Example: If Coal India pays ₹20 dividend per share and you own 100 shares, you receive ₹2,000 in cash — without selling a single share.</div>
+          <div class="example">🇮🕰️ Long term matters: ₹1,00,000 invested in Nifty 50 in 2000 would be worth over ₹20,00,000 today — a 20x return in 24 years.</div>
+          <p>The key to wealth creation in stocks is <strong>time in the market</strong> — not timing the market.</p>
+        `
+      }
+    ]
+  },
+  {
+    title: 'Reading Fundamentals',
+    lessons: [
+      {
+        title: 'What is P/E Ratio?',
+        content: `
+          <p>The <strong>Price to Earnings (P/E) ratio</strong> tells you how much the market is paying for every ₹1 of profit a company makes.</p>
+          <div class="highlight">📐 Formula: P/E = Stock Price ÷ Earnings Per Share (EPS)</div>
+          <h3>How to read it?</h3>
+          <p>If TCS trades at ₹3,500 and its EPS is ₹100 — P/E = 35. This means investors pay ₹35 for every ₹1 of TCS profit.</p>
+          <div class="example">🇮🇳 Indian context: Nifty 50 average P/E is usually 20-25. A stock with P/E above 40 is expensive. Below 15 might be cheap — but always check why.</div>
+          <div class="warning">⚠️ P/E alone doesn't tell the full story. A high P/E stock might still be a good buy if the company is growing very fast. Always compare with industry peers.</div>
+        `
+      },
+      {
+        title: 'What is EPS?',
+        content: `
+          <p><strong>Earnings Per Share (EPS)</strong> is the profit the company made divided by the number of shares outstanding.</p>
+          <div class="highlight">📐 Formula: EPS = Net Profit ÷ Total Shares</div>
+          <p>If Infosys made ₹24,000 crore profit and has 400 crore shares — EPS = ₹60 per share.</p>
+          <h3>Why does EPS matter?</h3>
+          <p>Rising EPS over multiple quarters shows the company is growing profitably. This is one of the most important signals of a healthy business.</p>
+          <div class="example">🇮🕰️ Rule of thumb: Look for companies that have grown EPS consistently by 15%+ per year over 5 years. These tend to be the best long-term investments.</div>
+        `
+      },
+      {
+        title: 'What is ROE?',
+        content: `
+          <p><strong>Return on Equity (ROE)</strong> measures how efficiently a company uses shareholders' money to generate profit.</p>
+          <div class="highlight">📐 Formula: ROE = Net Profit ÷ Shareholders Equity × 100</div>
+          <p>An ROE of 20% means the company generates ₹20 profit for every ₹100 of shareholder money. Higher is better.</p>
+          <div class="example">🇮🕰️ Companies like HDFC Bank and Asian Paints have consistently maintained ROE above 15-20%, which is why they are considered premium quality businesses.</div>
+          <div class="warning">⚠️ Be careful — a company can artificially boost ROE by taking on heavy debt. Always check ROE alongside Debt to Equity ratio.</div>
+        `
+      },
+      {
+        title: 'What is Market Cap?',
+        content: `
+          <p><strong>Market Capitalization</strong> is the total value of all shares of a company. It tells you the size of the company.</p>
+          <div class="highlight">📐 Formula: Market Cap = Stock Price × Total Shares</div>
+          <h3>Categories in India:</h3>
+          <p>🔵 <strong>Large cap:</strong> Market cap above ₹20,000 Cr — RELIANCE, TCS, HDFC Bank. Stable and less volatile.</p>
+          <p>🟡 <strong>Mid cap:</strong> ₹5,000–20,000 Cr — Higher growth potential, moderate risk.</p>
+          <p>🔴 <strong>Small cap:</strong> Below ₹5,000 Cr — High risk, high reward. Can be very volatile.</p>
+          <div class="example">🇮🕰️ As a beginner, focus on large-cap stocks first. They are more stable and easier to research. Add mid and small caps as you gain experience.</div>
+        `
+      },
+      {
+        title: 'What is Debt to Equity?',
+        content: `
+          <p><strong>Debt to Equity (D/E) ratio</strong> shows how much debt a company carries relative to its equity.</p>
+          <div class="highlight">📐 Formula: D/E = Total Debt ÷ Total Equity</div>
+          <p>A D/E of 0.5 means for every ₹1 of equity, the company has ₹0.50 of debt. Lower is generally safer.</p>
+          <h3>What is good D/E?</h3>
+          <p>It depends on the industry. Banks by nature have high D/E (they borrow to lend). But for manufacturing or IT companies, low D/E is preferred.</p>
+          <div class="example">🇮🕰️ IT companies like TCS and Infosys have near-zero debt — they fund growth entirely from profits. This makes them extremely safe businesses.</div>
+          <div class="warning">⚠️ Avoid companies with D/E above 2-3 unless you fully understand their business model and cash flow.</div>
+        `
+      }
+    ]
+  },
+  {
+    title: 'Investor Psychology',
+    lessons: [
+      {
+        title: 'What is FOMO?',
+        content: `
+          <p><strong>Fear Of Missing Out (FOMO)</strong> is one of the biggest destroyers of retail investor returns.</p>
+          <p>It happens when a stock rises sharply and you rush to buy it — not because of research, but because you are afraid of missing the gains.</p>
+          <div class="warning">⚠️ The problem: By the time you hear about a stock that went up 20% in a week, most of the smart money has already bought it. You are buying at the top.</div>
+          <div class="example">🇮🕰️ Classic FOMO: Adani stocks in 2022. Retail investors poured money in at peak prices after seeing massive gains. Many suffered heavy losses when prices corrected.</div>
+          <div class="highlight">✅ The fix: Before buying any stock that has recently risen sharply, ask yourself — "Would I buy this if it had NOT gone up?" If no, don't buy it.</div>
+        `
+      },
+      {
+        title: 'What is panic selling?',
+        content: `
+          <p><strong>Panic selling</strong> is selling stocks out of fear when prices drop — usually at exactly the wrong time.</p>
+          <p>Markets are volatile. A 10-15% correction is completely normal — it happens almost every year. But inexperienced investors see prices fall and immediately sell, locking in permanent losses.</p>
+          <div class="warning">⚠️ The cruel irony: Markets often recover quickly after a panic. Investors who sold at the bottom miss the entire recovery.</div>
+          <div class="example">🇮🕰️ COVID crash March 2020: Nifty 50 fell 38% in weeks. Panic sellers locked in huge losses. Those who held — or bought more — doubled their money within a year.</div>
+          <div class="highlight">✅ The fix: Before selling during a dip, ask — "Has the fundamental reason I bought this stock changed?" If not, hold. Volatility is the price you pay for long-term returns.</div>
+        `
+      },
+      {
+        title: 'What is loss aversion?',
+        content: `
+          <p>Research shows that humans feel the pain of a loss about <strong>twice as strongly</strong> as the pleasure of an equivalent gain. This is called <strong>loss aversion</strong>.</p>
+          <div class="highlight">🧠 Losing ₹10,000 feels twice as bad as gaining ₹10,000 feels good — even though the amounts are the same.</div>
+          <h3>How it hurts investors:</h3>
+          <p>Loss aversion causes investors to hold losing stocks too long (hoping to break even) and sell winning stocks too early (to lock in gains).</p>
+          <p>The result: You end up with a portfolio full of losers and no winners.</p>
+          <div class="example">🇮🕰️ The fix: Judge each stock on its future potential, not your purchase price. Your buy price is irrelevant to what the stock will do next. Cut losers early. Let winners run.</div>
+        `
+      },
+      {
+        title: 'What is confirmation bias?',
+        content: `
+          <p><strong>Confirmation bias</strong> is the tendency to seek out information that confirms what you already believe — and ignore information that contradicts it.</p>
+          <div class="warning">⚠️ Example: You bought Paytm stock. Now you only read positive news about Paytm and dismiss any negative analysis. This is confirmation bias.</div>
+          <h3>Why it is dangerous:</h3>
+          <p>It stops you from seeing real risks in your investments. You become emotionally attached to stocks instead of evaluating them objectively.</p>
+          <div class="highlight">✅ The fix: Actively seek out the bear case for every stock you own. Ask: "Why would a smart investor NOT buy this stock?" If you can answer that honestly, you understand your investment better.</div>
+          <div class="example">🇮🕰️ Great investors like Warren Buffett spend as much time understanding why they could be wrong as why they could be right.</div>
+        `
+      }
+    ]
+  },
+  {
+    title: 'Portfolio Strategy',
+    lessons: [
+      {
+        title: 'What is diversification?',
+        content: `
+          <p><strong>Diversification</strong> means spreading your investments across different stocks, sectors and asset classes to reduce risk.</p>
+          <div class="highlight">💡 The goal: Make sure no single bad investment can seriously hurt your overall portfolio.</div>
+          <h3>How to diversify in India:</h3>
+          <p>✅ Own stocks from at least 3-4 different sectors (IT, Banking, Pharma, Energy)</p>
+          <p>✅ No single stock should be more than 20-25% of your portfolio</p>
+          <p>✅ Mix large-cap and mid-cap stocks</p>
+          <div class="example">🇮🕰️ A simple diversified starter portfolio: RELIANCE (Energy) + TCS (IT) + HDFCBANK (Banking) + SUNPHARMA (Pharma) + TITAN (Consumer). 5 stocks, 5 sectors, balanced risk.</div>
+        `
+      },
+      {
+        title: 'What is rupee cost averaging?',
+        content: `
+          <p><strong>Rupee Cost Averaging (RCA)</strong> means investing a fixed amount regularly — regardless of whether prices are up or down.</p>
+          <div class="highlight">📅 Example: Invest ₹5,000 in Nifty 50 index every month for 10 years — no matter what the market does.</div>
+          <h3>Why it works:</h3>
+          <p>When prices are low, your ₹5,000 buys more shares. When prices are high, it buys fewer. Over time, your average cost per share is lower than if you had invested everything at once.</p>
+          <div class="example">🇮🕰️ This is the strategy behind SIP (Systematic Investment Plan) in mutual funds — one of the most powerful wealth-building tools for Indian investors.</div>
+          <div class="warning">⚠️ The enemy of RCA is stopping during market downturns. That is exactly when you should continue — because you are buying cheap.</div>
+        `
+      },
+      {
+        title: 'When should you sell a stock?',
+        content: `
+          <p>Selling is harder than buying. Most investors sell too early (winners) or too late (losers). Here are the right reasons to sell:</p>
+          <h3>✅ Good reasons to sell:</h3>
+          <p>• The fundamental reason you bought has changed (management change, business deterioration)</p>
+          <p>• The stock has become significantly overvalued (P/E much higher than peers)</p>
+          <p>• You need the money for something important</p>
+          <p>• A better opportunity exists and you need to free up capital</p>
+          <h3>❌ Bad reasons to sell:</h3>
+          <div class="warning">• The price dropped (unless the fundamentals changed)<br>• Someone told you to sell<br>• You are afraid of further losses<br>• The price rose and you want to "lock in profits" prematurely</div>
+          <div class="highlight">💡 Rule: Sell the business, not the price movement.</div>
+        `
+      },
+      {
+        title: 'What is position sizing?',
+        content: `
+          <p><strong>Position sizing</strong> means deciding how much of your portfolio to put in each stock.</p>
+          <div class="highlight">📐 A common rule: No single stock should be more than 10-15% of your portfolio for beginners.</div>
+          <h3>Why it matters:</h3>
+          <p>If you put 50% of your portfolio in one stock and it falls 30%, you lose 15% of your total portfolio. If it was only 10% of your portfolio, you only lose 3%.</p>
+          <div class="example">🇮🕰️ With ₹10,00,000 virtual money on Dalal Street AI — a balanced approach would be 8-10 positions of ₹80,000–1,00,000 each across different sectors.</div>
+          <div class="warning">⚠️ As a beginner, err on the side of smaller positions. You can always increase later as you gain confidence in a stock.</div>
+        `
+      }
+    ]
+  },
+  {
+    title: 'Bull & Bear Markets',
+    lessons: [
+      {
+        title: 'What is a bull market?',
+        content: `
+          <p>A <strong>bull market</strong> is a period when stock prices are rising — generally defined as a 20% rise from recent lows sustained over time.</p>
+          <div class="highlight">🐂 Bull markets are characterized by optimism, economic growth, and rising investor confidence.</div>
+          <h3>How long do they last?</h3>
+          <p>Historically, bull markets last much longer than bear markets — averaging 3-5 years. During a bull market, almost every stock rises, making it easy to make money.</p>
+          <div class="example">🇮🕰️ India's Nifty 50 went from 7,500 in 2016 to 18,000 in 2021 — a massive 5-year bull run. Investors who stayed invested through this period made 2.4x returns.</div>
+          <div class="warning">⚠️ The danger of bull markets: Overconfidence. When everything goes up, beginners think they are investing geniuses. The real test comes in a bear market.</div>
+        `
+      },
+      {
+        title: 'What is a bear market?',
+        content: `
+          <p>A <strong>bear market</strong> is a period of falling prices — generally defined as a 20% decline from recent highs sustained over time.</p>
+          <div class="highlight">🐻 Bear markets are characterized by fear, economic slowdown, and falling investor confidence.</div>
+          <h3>The opportunity in bear markets:</h3>
+          <p>While painful, bear markets are actually the best time to buy quality stocks at discounted prices. The investors who build the most wealth are those who buy during bear markets.</p>
+          <div class="example">🇮🕰️ Warren Buffett famously said: "Be fearful when others are greedy, and greedy when others are fearful." Bear markets are when you should be greedy — buying great companies cheap.</div>
+          <div class="warning">⚠️ Bear markets can last 1-2 years. Having cash reserves during these periods lets you take advantage of opportunities.</div>
+        `
+      },
+      {
+        title: 'What is market correction?',
+        content: `
+          <p>A <strong>market correction</strong> is a 10-20% decline from recent highs. It is less severe than a bear market and usually shorter — lasting weeks to a few months.</p>
+          <div class="highlight">📉 Corrections are completely normal. The Nifty 50 has had a correction almost every single year — yet it has delivered 12-15% annual returns over the long term.</div>
+          <h3>How to react to corrections:</h3>
+          <p>✅ Stay calm — corrections are temporary</p>
+          <p>✅ Do not sell quality stocks during corrections</p>
+          <p>✅ Consider buying more of your conviction stocks at lower prices</p>
+          <p>❌ Do not try to "time" the bottom — no one can predict it</p>
+          <div class="example">🇮🕰️ The investors who panic-sold during the 2020 COVID correction missed a 100%+ recovery within 12 months. Those who held — or bought — made extraordinary returns.</div>
+        `
+      }
+    ]
+  },
+  {
+    title: 'Indian Market Indices',
+    lessons: [
+      {
+        title: 'What is Nifty 50?',
+        content: `
+          <p>The <strong>Nifty 50</strong> is an index of the 50 largest and most liquid companies listed on the NSE. It represents about 65% of the total market capitalization of all NSE-listed stocks.</p>
+          <div class="highlight">📊 Think of Nifty 50 as the pulse of the Indian economy. When Nifty rises, it means India's biggest companies are doing well.</div>
+          <h3>What companies are in Nifty 50?</h3>
+          <p>Companies like RELIANCE, TCS, HDFCBANK, INFOSYS, ICICIBANK, HINDUNILVR, ITC — the biggest names across all sectors.</p>
+          <div class="example">🇮🕰️ If you had invested ₹1,00,000 in Nifty 50 in 2004, it would be worth over ₹20,00,000 today — without picking any individual stocks. This is the power of index investing.</div>
+          <div class="warning">⚠️ Nifty 50 is reviewed every 6 months. Underperforming companies are replaced by better ones — making it a self-cleaning index.</div>
+        `
+      },
+      {
+        title: 'What is Sensex?',
+        content: `
+          <p>The <strong>Sensex</strong> (Sensitive Index) is BSE's benchmark index of the 30 largest companies listed on the Bombay Stock Exchange. It is India's oldest stock market index, started in 1986.</p>
+          <div class="highlight">📊 Sensex and Nifty 50 move together most of the time — they both represent India's largest companies.</div>
+          <h3>Sensex vs Nifty 50:</h3>
+          <p>• Sensex has 30 stocks, Nifty has 50 — Nifty is more diversified</p>
+          <p>• Both are used as benchmarks for Indian mutual funds</p>
+          <p>• When someone says "the market is up today" they usually mean Nifty or Sensex is up</p>
+          <div class="example">🇮🕰️ Sensex started at 100 in 1979. Today it is above 70,000 — a 700x return in 45 years. This shows the incredible long-term wealth-creation power of the Indian stock market.</div>
+        `
+      },
+      {
+        title: 'What is Bank Nifty?',
+        content: `
+          <p><strong>Bank Nifty</strong> is an index of the 12 most liquid banking stocks on the NSE — including HDFCBANK, ICICIBANK, SBIN, KOTAKBANK, AXISBANK etc.</p>
+          <div class="highlight">🏦 Bank Nifty is more volatile than Nifty 50 because banking stocks are highly sensitive to interest rate changes and economic cycles.</div>
+          <h3>Why does Bank Nifty matter?</h3>
+          <p>Banking is the backbone of the economy. When banks do well, credit flows, businesses grow, and the whole economy benefits. So Bank Nifty is often seen as a leading indicator of economic health.</p>
+          <div class="example">🇮🕰️ When RBI cuts interest rates, Bank Nifty usually rallies because lower rates mean more loans and more business for banks. When rates rise, Bank Nifty often falls.</div>
+          <div class="warning">⚠️ For beginners, avoid trading Bank Nifty derivatives (F&O). Focus on buying individual banking stocks for long-term investment instead.</div>
+        `
+      }
+    ]
+  }
+];
+
+let currentModule = 0;
+let currentLesson = 0;
+
+function loadModule(moduleIndex) {
+  currentModule = moduleIndex;
+  currentLesson = 0;
+  document.querySelectorAll('.module-card').forEach((c, i) => {
+    c.classList.toggle('active', i === moduleIndex);
+  });
+  document.getElementById('lessonArea').classList.add('visible');
+  renderLesson();
+}
+
+function renderLesson() {
+  const mod = modules[currentModule];
+  const lesson = mod.lessons[currentLesson];
+  const total = mod.lessons.length;
+
+  document.getElementById('lessonTitle').textContent = lesson.title;
+  document.getElementById('lessonCounter').textContent = `Lesson ${currentLesson + 1} of ${total}`;
+  document.getElementById('lessonContent').innerHTML = lesson.content;
+  document.getElementById('progressFill').style.width = ((currentLesson + 1) / total * 100) + '%';
+}
+
+function nextLesson() {
+  const mod = modules[currentModule];
+  if (currentLesson < mod.lessons.length - 1) {
+    currentLesson++;
+    renderLesson();
+  }
+}
+
+function prevLesson() {
+  if (currentLesson > 0) {
+    currentLesson--;
+    renderLesson();
+  }
+}
+
+// Load first lesson on page load
+loadModule(0);
+</script>
+</body>
+</html>

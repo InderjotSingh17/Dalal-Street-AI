@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from .models import UserProfile
+from django.utils import timezone
+
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -12,6 +14,11 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user:
             login(request, user)
+            profile = UserProfile.objects.get(user=user)
+            today = timezone.now().date()
+            if profile.last_login_date != today:
+                profile.last_login_date = today
+                profile.add_xp(5)
             return redirect('dashboard')
         else:
             return render(request, 'accounts/login.html', {'error': 'Invalid username or password'})
