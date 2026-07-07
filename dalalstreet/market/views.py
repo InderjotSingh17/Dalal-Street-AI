@@ -79,12 +79,16 @@ def stock_detail(request, symbol):
     except:
         pass
     coaching_tip = request.session.pop('coaching_tip', None)
+    mentor_card = request.session.pop('mentor_card', None)
+    mentor_event = request.session.pop('mentor_event', None)
     return render(request, 'market/stock_detail.html', {
         'stock': stock,
         'balance': profile.balance,
         'holding': holding,
         'in_watchlist': in_watchlist,
         'coaching_tip': coaching_tip,
+        'mentor_card': mentor_card,
+        'mentor_event': mentor_event,
     })
 
 @login_required(login_url='/login/')
@@ -125,18 +129,13 @@ def buy_stock(request, symbol):
         xp_to_add += 50
     profile.add_xp(xp_to_add)
     check_missions_on_trade(request.user, profile, quantity)
-    from market.mentor import get_trade_coaching_tip
-    request.session['coaching_tip'] = get_trade_coaching_tip(request.user, stock, 'BUY', quantity)
-
-    Order.objects.create(
-        user=request.user,
-        stock=stock,
-        order_type='BUY',
-        quantity=quantity,
-        price=stock.current_price,
-        total_amount=total_cost,
-    )
-
+    # AI Mentor analysis — runs automatically
+    # AI Mentor analysis — runs automatically
+    from market.mentor.orchestrator import MentorOrchestrator
+    mentor = MentorOrchestrator(request.user)
+    mentor_card = mentor.on_buy(stock, quantity, float(total_cost))
+    request.session['mentor_card'] = mentor_card
+    request.session['mentor_event'] = 'buy'
     return redirect('stock_detail', symbol=symbol)
 
 
@@ -163,6 +162,7 @@ def sell_stock(request, symbol):
     profile.balance += total_value
     profile.save()
 
+    avg_price = float(holding.avg_buy_price)  # capture BEFORE mutating/deleting the holding
     holding.quantity -= quantity
     if holding.quantity == 0:
         holding.delete()
@@ -171,23 +171,18 @@ def sell_stock(request, symbol):
 
     profile.add_xp(10)
     check_missions_on_trade(request.user, profile, quantity)
-    from market.mentor import get_trade_coaching_tip
-    request.session['coaching_tip'] = get_trade_coaching_tip(request.user, stock, 'SELL', quantity)
-
-    Order.objects.create(
-        user=request.user,
-        stock=stock,
-        order_type='SELL',
-        quantity=quantity,
-        price=stock.current_price,
-        total_amount=total_value,
-    )
-
+    # AI Mentor analysis — runs automatically
+    from market.mentor.orchestrator import MentorOrchestrator
+    mentor = MentorOrchestrator(request.user)
+    mentor_card = mentor.on_sell(stock, quantity, float(stock.current_price), avg_price)
+    request.session['mentor_card'] = mentor_card
+    request.session['mentor_event'] = 'sell'
     return redirect('stock_detail', symbol=symbol)
 
 @login_required(login_url='/login/')
 def portfolio(request):
     from portfolio.models import Holding
+    from market.mentor.orchestrator import MentorOrchestrator
     profile = UserProfile.objects.get(user=request.user)
     holdings = Holding.objects.filter(user=request.user).select_related('stock')
 
@@ -196,6 +191,11 @@ def portfolio(request):
     total_pnl = total_current - total_invested
     total_pnl_pct = (total_pnl / total_invested * 100) if total_invested > 0 else 0
 
+    ai_report = None
+    if holdings.exists():
+        mentor = MentorOrchestrator(request.user)
+        ai_report = mentor.on_portfolio_view()
+
     return render(request, 'market/portfolio.html', {
         'holdings': holdings,
         'balance': profile.balance,
@@ -203,6 +203,7 @@ def portfolio(request):
         'total_current': round(total_current, 2),
         'total_pnl': round(total_pnl, 2),
         'total_pnl_pct': round(total_pnl_pct, 2),
+        'ai_report': ai_report,
     })
 
 @login_required(login_url='/login/')
@@ -324,7 +325,7 @@ def leaderboard(request):
 
 @login_required(login_url='/login/')
 def mentor(request):
-    from market.mentor import get_diversification_score, get_risk_level, get_behavioral_insights, get_portfolio_tips, get_sector_allocation
+    from market.mentor_rules import get_diversification_score, get_risk_level, get_behavioral_insights, get_portfolio_tips, get_sector_allocation
     profile = UserProfile.objects.get(user=request.user)
 
     diversification = get_diversification_score(request.user)
@@ -350,3 +351,34 @@ def learn(request):
     return render(request, 'market/learn.html', {
         'balance': profile.balance,
     })
+
+@login_required(login_url='/login/')
+def ai_mentor(request):
+    profile = UserProfile.objects.get(user=request.user)
+    return render(request, 'market/ai_mentor.html', {
+        'balance': profile.balance,
+    })
+
+@login_required(login_url='/login/')
+def ai_mentor_chat(request):
+    import json
+    from market.ai_mentor import ask_ai_mentor
+
+    if request.method != 'POST':
+        return redirect('ai_mentor')
+
+    data = json.loads(request.body)
+    user_message = data.get('message', '')
+    chat_history = data.get('history', [])
+
+    if not user_message.strip():
+        from django.http import JsonResponse
+        return JsonResponse({'error': 'Empty message'}, status=400)
+
+    try:
+        response = ask_ai_mentor(request.user, user_message, chat_history)
+        from django.http import JsonResponse
+        return JsonResponse({'response': response})
+    except Exception as e:
+        from django.http import JsonResponse
+        return JsonResponse({'error': str(e)}, status=500)

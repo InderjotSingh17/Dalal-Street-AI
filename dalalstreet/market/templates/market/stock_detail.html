@@ -110,7 +110,101 @@
   <span onclick="document.getElementById('coachingBanner').style.display='none'" style="cursor:pointer;color:rgba(255,255,255,0.3);font-size:18px;padding:4px;">✕</span>
 </div>
 {% endif %}
+{% if mentor_card %}
+<div id="mentorCard" style="background:#07080f;border-bottom:0.5px solid rgba(255,255,255,0.08);padding:20px 32px;">
+  <div style="max-width:900px;margin:0 auto;">
 
+    <!-- HEADER -->
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <div style="width:40px;height:40px;border-radius:50%;background:rgba(0,214,143,0.1);border:1.5px solid #00d68f;display:flex;align-items:center;justify-content:center;font-size:20px;">🤖</div>
+      <div>
+        <div style="font-size:14px;font-weight:700;color:#fff;">Mentor Analysis</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.4);">Auto-generated after your {% if mentor_event == 'buy' %}buy{% else %}sell{% endif %} trade</div>
+      </div>
+      <span onclick="document.getElementById('mentorCard').style.display='none'" style="margin-left:auto;cursor:pointer;color:rgba(255,255,255,0.3);font-size:20px;">✕</span>
+    </div>
+
+    {% if mentor_event == 'buy' %}
+    <!-- BUY ANALYSIS -->
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:start;">
+      <div style="text-align:center;background:#111520;border:0.5px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px 20px;min-width:120px;">
+        <div style="font-size:32px;font-weight:800;color:
+          {% if mentor_card.trade_quality_score >= 8 %}#00d68f
+          {% elif mentor_card.trade_quality_score >= 6 %}#ffc107
+          {% else %}#ff6b6b{% endif %};">{{ mentor_card.trade_quality_score }}/10</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px;">Trade Quality</div>
+        <div style="margin-top:8px;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;
+          {% if mentor_card.verdict == 'Excellent' %}background:rgba(0,214,143,0.1);color:#00d68f;
+          {% elif mentor_card.verdict == 'Good' %}background:rgba(0,214,143,0.08);color:#00d68f;
+          {% elif mentor_card.verdict == 'Acceptable' %}background:rgba(255,193,7,0.1);color:#ffc107;
+          {% else %}background:rgba(255,107,107,0.1);color:#ff6b6b;{% endif %}">
+          {{ mentor_card.verdict }}
+        </div>
+      </div>
+      <div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+          <div style="background:#111520;border-radius:10px;padding:12px;">
+            <div style="font-size:11px;color:#00d68f;font-weight:700;margin-bottom:6px;">✅ STRENGTHS</div>
+            {% for s in mentor_card.strengths %}
+            <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:4px;">• {{ s }}</div>
+            {% endfor %}
+          </div>
+          <div style="background:#111520;border-radius:10px;padding:12px;">
+            <div style="font-size:11px;color:#ff6b6b;font-weight:700;margin-bottom:6px;">⚠️ WEAKNESSES</div>
+            {% for w in mentor_card.weaknesses %}
+            <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:4px;">• {{ w }}</div>
+            {% endfor %}
+          </div>
+        </div>
+        <div style="background:#111520;border-radius:10px;padding:12px;margin-bottom:10px;">
+          <div style="font-size:11px;color:#00d68f;font-weight:700;margin-bottom:6px;">📚 {{ mentor_card.concept_name }}</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.6;">{{ mentor_card.educational_insight }}</div>
+        </div>
+        {% if mentor_card.behavioural_observation %}
+        <div style="background:rgba(255,193,7,0.06);border:0.5px solid rgba(255,193,7,0.2);border-radius:10px;padding:12px;">
+          <div style="font-size:11px;color:#ffc107;font-weight:700;margin-bottom:4px;">🧠 BEHAVIORAL ALERT</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.6);">{{ mentor_card.behavioural_observation }}</div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {% else %}
+    <!-- SELL ANALYSIS -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+      <div style="background:#111520;border-radius:10px;padding:14px;">
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);font-weight:700;margin-bottom:6px;">EXIT QUALITY</div>
+        <div style="font-size:16px;font-weight:700;color:
+          {% if mentor_card.exit_quality == 'Excellent' or mentor_card.exit_quality == 'Good' %}#00d68f
+          {% elif mentor_card.exit_quality == 'Acceptable' %}#ffc107
+          {% else %}#ff6b6b{% endif %};">{{ mentor_card.exit_quality }}</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-top:6px;">{{ mentor_card.verdict }}</div>
+      </div>
+      <div style="background:#111520;border-radius:10px;padding:14px;">
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);font-weight:700;margin-bottom:6px;">📚 {{ mentor_card.concept_name }}</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.6;">{{ mentor_card.concept_explanation }}</div>
+      </div>
+    </div>
+    <div style="background:#111520;border-radius:10px;padding:14px;margin-bottom:10px;">
+      <div style="font-size:11px;color:#00d68f;font-weight:700;margin-bottom:6px;">🔍 MENTOR ANALYSIS</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.6;">{{ mentor_card.analysis }}</div>
+    </div>
+    {% if mentor_card.behavioural_pattern and mentor_card.behavioural_pattern != 'logical_exit' %}
+    <div style="background:rgba(255,193,7,0.06);border:0.5px solid rgba(255,193,7,0.2);border-radius:10px;padding:14px;margin-bottom:10px;">
+      <div style="font-size:11px;color:#ffc107;font-weight:700;margin-bottom:4px;">🧠 BEHAVIORAL PATTERN: {{ mentor_card.behavioural_pattern|upper }}</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.6);">{{ mentor_card.behavioural_explanation }}</div>
+    </div>
+    {% endif %}
+    <div style="background:rgba(0,214,143,0.04);border:0.5px solid rgba(0,214,143,0.15);border-radius:10px;padding:14px;">
+      <div style="font-size:11px;color:#00d68f;font-weight:700;margin-bottom:4px;">💡 LESSON & NEXT STEPS</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:6px;">{{ mentor_card.lesson }}</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.5);">→ {{ mentor_card.next_steps }}</div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endif %}
 <!-- NAV -->
 <nav class="nav">
   <div class="nav-left">

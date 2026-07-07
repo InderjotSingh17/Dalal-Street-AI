@@ -21,4 +21,6 @@ urlpatterns = [
     path('leaderboard/', views.leaderboard, name='leaderboard'),
     path('mentor/', views.mentor, name='mentor'),
     path('learn/', views.learn, name='learn'),
+    path('ai-mentor/', views.ai_mentor, name='ai_mentor'),
+    path('ai-mentor/chat/', views.ai_mentor_chat, name='ai_mentor_chat'),
 ]

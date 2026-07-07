@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Mentor Chat — Dalal Street AI</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#07080f;color:#e8e8f0;font-family:'Segoe UI',sans-serif;height:100vh;display:flex;flex-direction:column;}
+    .nav{display:flex;justify-content:space-between;align-items:center;padding:0 32px;height:56px;background:#07080f;border-bottom:0.5px solid rgba(255,255,255,0.07);flex-shrink:0;}
+    .nav-left{display:flex;align-items:center;gap:32px;}
+    .logo{font-size:16px;font-weight:700;color:#fff;text-decoration:none;}
+    .logo span{color:#00d68f;}
+    .nav-tabs{display:flex;}
+    .nav-tab{padding:0 16px;height:56px;display:flex;align-items:center;font-size:14px;color:rgba(255,255,255,0.5);text-decoration:none;border-bottom:2px solid transparent;}
+    .nav-tab:hover{color:#fff;}
+    .nav-tab.active{color:#fff;border-bottom-color:#00d68f;}
+    .nav-right{display:flex;align-items:center;gap:16px;}
+    .balance-chip{background:#111520;border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 14px;font-size:13px;}
+    .balance-chip span{color:#00d68f;font-weight:700;}
+    .btn-logout{font-size:12px;padding:6px 14px;border:0.5px solid rgba(255,255,255,0.1);border-radius:7px;background:transparent;color:rgba(255,255,255,0.5);text-decoration:none;}
+
+    .chat-layout{display:flex;flex:1;overflow:hidden;}
+
+    /* SIDEBAR */
+    .chat-sidebar{width:260px;border-right:0.5px solid rgba(255,255,255,0.07);padding:20px;flex-shrink:0;overflow-y:auto;}
+    .sidebar-heading{font-size:12px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;}
+    .suggestion-btn{width:100%;text-align:left;padding:10px 12px;background:#111520;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;color:rgba(255,255,255,0.6);font-size:12px;cursor:pointer;margin-bottom:8px;line-height:1.4;font-family:'Segoe UI',sans-serif;}
+    .suggestion-btn:hover{border-color:rgba(0,214,143,0.3);color:#fff;}
+    .mentor-info{background:#0f1a14;border:0.5px solid rgba(0,214,143,0.15);border-radius:10px;padding:14px;margin-top:20px;}
+    .mentor-info-title{font-size:12px;font-weight:700;color:#00d68f;margin-bottom:8px;}
+    .mentor-info-text{font-size:12px;color:rgba(255,255,255,0.4);line-height:1.6;}
+
+    /* CHAT AREA */
+    .chat-main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+    .chat-header{padding:16px 24px;border-bottom:0.5px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:12px;flex-shrink:0;}
+    .mentor-avatar{width:40px;height:40px;border-radius:50%;background:rgba(0,214,143,0.1);border:1.5px solid #00d68f;display:flex;align-items:center;justify-content:center;font-size:20px;}
+    .mentor-name{font-size:15px;font-weight:700;color:#fff;}
+    .mentor-status{font-size:12px;color:#00d68f;}
+    .online-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#00d68f;margin-right:4px;animation:pulse 2s infinite;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+    .messages{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px;}
+    .message{display:flex;gap:12px;max-width:80%;}
+    .message.user{align-self:flex-end;flex-direction:row-reverse;}
+    .msg-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+    .ai-avatar{background:rgba(0,214,143,0.1);border:1px solid rgba(0,214,143,0.3);}
+    .user-avatar{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);}
+    .msg-bubble{padding:12px 16px;border-radius:12px;font-size:14px;line-height:1.6;}
+    .ai-bubble{background:#111520;border:0.5px solid rgba(255,255,255,0.07);color:#e8e8f0;border-radius:4px 12px 12px 12px;}
+    .user-bubble{background:#00d68f;color:#07080f;font-weight:500;border-radius:12px 4px 12px 12px;}
+    .typing-indicator{display:flex;gap:4px;padding:12px 16px;background:#111520;border:0.5px solid rgba(255,255,255,0.07);border-radius:4px 12px 12px 12px;width:fit-content;}
+    .typing-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.4);animation:typing 1.2s infinite;}
+    .typing-dot:nth-child(2){animation-delay:.2s;}
+    .typing-dot:nth-child(3){animation-delay:.4s;}
+    @keyframes typing{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+
+    .chat-input-area{padding:16px 24px;border-top:0.5px solid rgba(255,255,255,0.07);display:flex;gap:10px;flex-shrink:0;}
+    .chat-input{flex:1;padding:12px 16px;background:#111520;border:0.5px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;font-size:14px;font-family:'Segoe UI',sans-serif;outline:none;resize:none;}
+    .chat-input:focus{border-color:rgba(0,214,143,0.4);}
+    .chat-input::placeholder{color:rgba(255,255,255,0.25);}
+    .btn-send{padding:12px 20px;background:#00d68f;color:#07080f;font-size:14px;font-weight:700;border:none;border-radius:10px;cursor:pointer;flex-shrink:0;}
+    .btn-send:disabled{opacity:0.5;cursor:not-allowed;}
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-left">
+    <a class="logo" href="{% url 'landing' %}">📈 Dalal Street <span>AI</span></a>
+    <div class="nav-tabs">
+      <a class="nav-tab" href="{% url 'dashboard' %}">Explore</a>
+      <a class="nav-tab" href="{% url 'portfolio' %}">Holdings</a>
+      <a class="nav-tab" href="{% url 'orders' %}">Orders</a>
+      <a class="nav-tab" href="{% url 'watchlist' %}">Watchlist</a>
+      <a class="nav-tab" href="{% url 'missions' %}">Missions</a>
+      <a class="nav-tab" href="{% url 'leaderboard' %}">Leaderboard</a>
+      <a class="nav-tab" href="{% url 'mentor' %}">Mentor</a>
+      <a class="nav-tab" href="{% url 'learn' %}">Learn</a>
+      <a class="nav-tab active" href="{% url 'ai_mentor' %}">AI Chat</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="balance-chip">Balance: <span>₹{{ balance|floatformat:0 }}</span></div>
+    <a class="btn-logout" href="{% url 'logout' %}">Logout</a>
+  </div>
+</nav>
+
+<div class="chat-layout">
+
+  <!-- SIDEBAR -->
+  <div class="chat-sidebar">
+    <div class="sidebar-heading">Ask your mentor</div>
+    <button class="suggestion-btn" onclick="sendSuggestion(this)">Analyse my portfolio and tell me what to improve</button>
+    <button class="suggestion-btn" onclick="sendSuggestion(this)">Am I too concentrated in any one stock?</button>
+    <button class="suggestion-btn" onclick="sendSuggestion(this)">Explain P/E ratio with an example from my holdings</button>
+    <button class="suggestion-btn" onclick="sendSuggestion(this)">What is a good strategy for a beginner investor?</button>
+    <button class="suggestion-btn" onclick="sendSuggestion(this)">How is my portfolio performing?</button>
+    <button class="suggestion-btn" onclick="sendSuggestion(this)">What sectors am I missing in my portfolio?</button>
+    <button class="suggestion-btn" onclick="sendSuggestion(this)">Teach me about diversification</button>
+    <button class="suggestion-btn" onclick="sendSuggestion(this)">Should I buy more stocks or hold cash?</button>
+
+    <div class="mentor-info">
+      <div class="mentor-title">🤖 About your AI mentor</div>
+      <div class="mentor-info-text">Your mentor knows your portfolio, holdings, P&L and trading history. Ask anything about investing — it will answer using your real data.</div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="chat-main">
+    <div class="chat-header">
+      <div class="mentor-avatar">🤖</div>
+      <div>
+        <div class="mentor-name">Dalal Street AI Mentor</div>
+        <div class="mentor-status"><span class="online-dot"></span>Online · Knows your portfolio</div>
+      </div>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="message">
+        <div class="msg-avatar ai-avatar">🤖</div>
+        <div class="ai-bubble msg-bubble">
+          Namaste! 🙏 I am your personal investing mentor on Dalal Street AI. I can see your portfolio, holdings and trading history — so I can give you advice that is specific to your situation.<br><br>
+          Ask me anything — from basic concepts like "what is P/E ratio" to specific questions like "is my portfolio diversified enough?" I am here to help you become a confident investor! 📈
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-input-area">
+      <textarea class="chat-input" id="chatInput" placeholder="Ask your mentor anything..." rows="1" onkeydown="handleKey(event)"></textarea>
+      <button class="btn-send" id="sendBtn" onclick="sendMessage()">Send →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const chatHistory = [];
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }
+
+  function sendSuggestion(btn) {
+    document.getElementById('chatInput').value = btn.textContent;
+    sendMessage();
+  }
+
+  function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const message = input.value.trim();
+    if (!message) return;
+
+    appendMessage('user', message);
+    input.value = '';
+
+    const sendBtn = document.getElementById('sendBtn');
+    sendBtn.disabled = true;
+
+    const typingId = appendTyping();
+
+    fetch('{% url "ai_mentor_chat" %}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken'),
+      },
+      body: JSON.stringify({
+        message: message,
+        history: chatHistory,
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      removeTyping(typingId);
+      sendBtn.disabled = false;
+      if (data.response) {
+        appendMessage('ai', data.response);
+        chatHistory.push({role: 'user', content: message});
+        chatHistory.push({role: 'assistant', content: data.response});
+        if (chatHistory.length > 20) chatHistory.splice(0, 2);
+      } else {
+        appendMessage('ai', '⚠️ Sorry, I could not process that. Please try again.');
+      }
+    })
+    .catch(() => {
+      removeTyping(typingId);
+      sendBtn.disabled = false;
+      appendMessage('ai', '⚠️ Connection error. Please check your internet and try again.');
+    });
+  }
+
+  function appendMessage(role, content) {
+    const messages = document.getElementById('messages');
+    const div = document.createElement('div');
+    div.className = `message ${role === 'user' ? 'user' : ''}`;
+    div.innerHTML = `
+      <div class="msg-avatar ${role === 'user' ? 'user-avatar' : 'ai-avatar'}">${role === 'user' ? '👤' : '🤖'}</div>
+      <div class="${role === 'user' ? 'user-bubble' : 'ai-bubble'} msg-bubble">${content.replace(/\n/g, '<br>')}</div>
+    `;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function appendTyping() {
+    const messages = document.getElementById('messages');
+    const div = document.createElement('div');
+    const id = 'typing-' + Date.now();
+    div.id = id;
+    div.className = 'message';
+    div.innerHTML = `
+      <div class="msg-avatar ai-avatar">🤖</div>
+      <div class="typing-indicator">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    `;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+    return id;
+  }
+
+  function removeTyping(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  }
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+</script>
+</body>
+</html>
