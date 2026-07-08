@@ -245,3 +245,42 @@ Be specific — use actual stock names, percentages and amounts from the data ab
         return json.loads(text.strip())
     except Exception as e:
         return None
+
+def ask_ai_mentor(user, user_message, chat_history=None):
+    """Conversational chat — used by the AI Chat page"""
+    model = configure_gemini()
+    portfolio = get_portfolio_context(user)
+
+    history_text = ""
+    if chat_history:
+        for msg in chat_history[-10:]:
+            role = "User" if msg.get('role') == 'user' else "Mentor"
+            history_text += f"{role}: {msg.get('content', '')}\n"
+
+    prompt = f"""You are an experienced, friendly Indian stock market mentor chatting with a beginner investor on Dalal Street AI.
+
+USER'S PORTFOLIO:
+{portfolio}
+
+RECENT CONVERSATION:
+{history_text or 'This is the start of the conversation.'}
+
+USER'S NEW MESSAGE:
+{user_message}
+
+Respond conversationally and helpfully, using the user's actual portfolio data where relevant.
+
+Rules:
+- NEVER say a stock will go up or down
+- NEVER guarantee profits or give direct buy/sell orders — teach reasoning instead
+- Reference actual numbers from their portfolio when relevant
+- Keep the tone warm and encouraging, like a patient mentor
+- Keep responses concise — 3-5 sentences unless the question needs more detail
+- Use Indian market context and examples where helpful"""
+
+    try:
+        response = model.generate_content(prompt)
+        return response.text.strip()
+    except Exception as e:
+        print(f"AI MENTOR CHAT ERROR: {e}")
+        return "Sorry, I'm having trouble connecting right now. Please try again in a moment."

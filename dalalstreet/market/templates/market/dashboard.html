@@ -262,9 +262,9 @@
     <div class="sidebar-card">
       <div class="sidebar-title">My portfolio</div>
       <div class="portfolio-stat"><span class="stat-key">Balance</span><span class="stat-val">₹{{ balance|floatformat:0 }}</span></div>
-      <div class="portfolio-stat"><span class="stat-key">Invested</span><span class="stat-val">—</span></div>
-      <div class="portfolio-stat"><span class="stat-key">Current value</span><span class="stat-val">—</span></div>
-      <div class="portfolio-stat"><span class="stat-key">Total P&L</span><span class="stat-val">—</span></div>
+      <div class="portfolio-stat"><span class="stat-key">Invested</span><span class="stat-val">₹{{ total_invested|floatformat:0 }}</span></div>
+      <div class="portfolio-stat"><span class="stat-key">Current value</span><span class="stat-val">₹{{ total_current|floatformat:0 }}</span></div>
+      <div class="portfolio-stat"><span class="stat-key">Total P&L</span><span class="stat-val" style="color:{% if total_pnl >= 0 %}#00d68f{% else %}#ff6b6b{% endif %};">{% if total_pnl >= 0 %}+{% endif %}₹{{ total_pnl|floatformat:0 }}</span></div>
     </div>
     <!-- XP CARD — ADD HERE -->
     <div class="sidebar-card">

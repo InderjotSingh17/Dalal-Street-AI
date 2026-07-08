@@ -211,9 +211,14 @@
     <a class="logo" href="{% url 'landing' %}">📈 Dalal Street <span>AI</span></a>
     <div class="nav-tabs">
       <a class="nav-tab active" href="{% url 'dashboard' %}">Explore</a>
-      <a class="nav-tab" href="#">Holdings</a>
-      <a class="nav-tab" href="#">Orders</a>
-      <a class="nav-tab" href="#">Watchlist</a>
+      <a class="nav-tab" href="{% url 'portfolio' %}">Holdings</a>
+      <a class="nav-tab" href="{% url 'orders' %}">Orders</a>
+      <a class="nav-tab" href="{% url 'watchlist' %}">Watchlist</a>
+      <a class="nav-tab" href="{% url 'missions' %}">Missions</a>
+      <a class="nav-tab" href="{% url 'leaderboard' %}">Leaderboard</a>
+      <a class="nav-tab" href="{% url 'mentor' %}">Mentor</a>
+      <a class="nav-tab" href="{% url 'learn' %}">Learn</a>
+      <a class="nav-tab" href="{% url 'ai_mentor' %}">AI Chat</a>
     </div>
   </div>
   <div class="nav-right">

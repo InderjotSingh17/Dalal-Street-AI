@@ -42,7 +42,11 @@ def dashboard(request):
     losers = Stock.objects.order_by('change_percent')[:5]
     sectors = Stock.objects.exclude(sector='').values_list('sector', flat=True).distinct().order_by('sector')
     profile = UserProfile.objects.get(user=request.user)
-
+    from portfolio.models import Holding
+    holdings = Holding.objects.filter(user=request.user).select_related('stock')
+    total_invested = sum(h.invested_value for h in holdings)
+    total_current = sum(h.current_value for h in holdings)
+    total_pnl = total_current - total_invested
     context = {
         'stocks': stocks,
         'gainers': gainers,
@@ -58,6 +62,9 @@ def dashboard(request):
         'level_name': profile.level_name,
         'next_level_xp': profile.next_level_xp,
         'xp_progress': profile.xp_progress_percent,
+        'total_invested': round(total_invested, 2),
+        'total_current': round(total_current, 2),       
+        'total_pnl': round(total_pnl, 2)
     }
     return render(request, 'market/dashboard.html', context)
 
