@@ -13,7 +13,7 @@ LEVELS = [
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    balance = models.DecimalField(max_digits=15, decimal_places=2, default=1000000)
+    balance = models.DecimalField(max_digits=15, decimal_places=2, default=50000)
     xp = models.IntegerField(default=0)
     last_login_date = models.DateField(null=True, blank=True)
 

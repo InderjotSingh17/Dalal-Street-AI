@@ -34,7 +34,7 @@ def register_view(request):
         if User.objects.filter(username=username).exists():
             return render(request, 'accounts/register.html', {'error': 'Username already taken'})
         user = User.objects.create_user(username=username, password=password, email=email)
-        UserProfile.objects.create(user=user, balance=1000000)
+        UserProfile.objects.create(user=user, balance=50000)
         login(request, user)
         return redirect('dashboard')
     return render(request, 'accounts/register.html')
