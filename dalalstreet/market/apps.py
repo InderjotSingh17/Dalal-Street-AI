@@ -5,6 +5,7 @@ class MarketConfig(AppConfig):
     name = 'market'
 
     def ready(self):
-        if 'runserver' in sys.argv:
-            from market import scheduler
-            scheduler.start()
+        pass
+        #if 'runserver' in sys.argv:
+        #    from market import scheduler
+        #    scheduler.start()
