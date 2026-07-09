@@ -3,12 +3,15 @@ name: Update Stock Prices
 on:
   schedule:
     - cron: "*/15 * * * *"
-
   workflow_dispatch:
 
 jobs:
   update-market:
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: dalalstreet
 
     steps:
       - name: Checkout Repository
@@ -29,13 +32,11 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: |
-          python manage.py migrate
+        run: python manage.py migrate
 
       - name: Fetch latest stock prices
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: |
-          python manage.py fetch_stocks
+        run: python manage.py fetch_stocks
