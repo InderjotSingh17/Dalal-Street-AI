@@ -128,3 +128,4 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+ASGI_APPLICATION = "dalalstreet.asgi.application"
