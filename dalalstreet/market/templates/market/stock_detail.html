@@ -240,14 +240,29 @@
       <div class="stock-symbol">{{ stock.symbol }} · NSE</div>
       <div class="stock-name">{{ stock.company_name }}</div>
       <div class="price-row">
-        <div class="price-big">₹{{ stock.current_price }}</div>
-        {% if stock.change_percent >= 0 %}
-          <div class="price-change-up">▲ {{ stock.change_percent }}% today</div>
-        {% else %}
-          <div class="price-change-down">▼ {{ stock.change_percent|stringformat:".2f"|slice:"1:" }}% today</div>
-        {% endif %}
+          <div class="price-big" id="livePrice">
+              ₹{{ stock.current_price }}
+          </div>
+          <div
+              id="liveChange"
+              class="{% if stock.change_percent >= 0 %}price-change-up{% else %}price-change-down{% endif %}"
+          >
+              {% if stock.change_percent >= 0 %}
+                  ▲ {{ stock.change_percent }}% today
+              {% else %}
+                  ▼ {{ stock.change_percent|stringformat:".2f"|slice:"1:" }}% today
+              {% endif %}
+          </div>
       </div>
-      <div class="price-meta">Prev close ₹{{ stock.previous_close }} &nbsp;·&nbsp; Open ₹{{ stock.open_price }} &nbsp;·&nbsp; Vol {{ stock.volume|default:"—" }}</div>
+      <div class="price-meta">
+        Prev close <span id="prevClose">
+          ₹{{ stock.previous_close }}
+        </span> 
+        &nbsp;·&nbsp; 
+        Open ₹{{ stock.open_price }} 
+        &nbsp;·&nbsp; 
+        Vol {{ stock.volume|default:"—" }}
+      </div>
       <a href="{% url 'toggle_watchlist' stock.symbol %}" style="display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:7px 16px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;
       {% if in_watchlist %}background:rgba(0,214,143,0.1);color:#00d68f;border:0.5px solid rgba(0,214,143,0.2);{% else %}background:#111520;color:rgba(255,255,255,0.5);border:0.5px solid rgba(255,255,255,0.1);{% endif %}">
         {% if in_watchlist %}★ Watchlisted{% else %}☆ Add to watchlist{% endif %}
@@ -482,10 +497,15 @@
         </div>
         <div class="trade-field">
           <div class="trade-label">Price (Market)</div>
-          <input class="trade-input" value="₹{{ stock.current_price }}" readonly>
+          <input
+              class="trade-input"
+              id="buyPrice"
+              value="₹{{ stock.current_price }}"
+              readonly
+          >
         </div>
         <div class="trade-summary" id="buySummary">
-          <div class="trade-sum-row"><span>Price per share</span><strong>₹{{ stock.current_price }}</strong></div>
+          <div class="trade-sum-row"><span>Price per share</span><strong id="buySummaryPrice">₹{{ stock.current_price }}</strong></div>
           <div class="trade-sum-row"><span>Quantity</span><strong id="buyQtyDisplay">1</strong></div>
           <div class="trade-sum-row"><span>Total amount</span><strong id="buyTotal">₹{{ stock.current_price }}</strong></div>
         </div>
@@ -504,10 +524,15 @@
         </div>
         <div class="trade-field">
           <div class="trade-label">Price (Market)</div>
-          <input class="trade-input" value="₹{{ stock.current_price }}" readonly>
+          <input
+              class="trade-input"
+              id="sellPrice"
+              value="₹{{ stock.current_price }}"
+              readonly
+          >
         </div>
         <div class="trade-summary" id="sellSummary">
-          <div class="trade-sum-row"><span>Price per share</span><strong>₹{{ stock.current_price }}</strong></div>
+          <div class="trade-sum-row"><span>Price per share</span><strong id="sellSummaryPrice">₹{{ stock.current_price }}</strong></div>
           <div class="trade-sum-row"><span>Quantity</span><strong id="sellQtyDisplay">1</strong></div>
           <div class="trade-sum-row"><span>You receive</span><strong id="sellTotal">₹{{ stock.current_price }}</strong></div>
         </div>
@@ -524,13 +549,13 @@
 </div>
 
 <script>
-  const price = {{ stock.current_price }};
+  let currentPrice = {{ stock.current_price }};
   const low52 = {{ stock.week52_low|default:0 }};
   const high52 = {{ stock.week52_high|default:0 }};
 
   // 52W range bar
   if (high52 > low52) {
-    const pct = ((price - low52) / (high52 - low52)) * 100;
+    const pct = ((currentPrice - low52) / (high52 - low52)) * 100;
     const fill = document.getElementById('rangeFill');
     const dot = document.getElementById('rangeDot');
     if (fill) fill.style.width = pct + '%';
@@ -548,7 +573,7 @@
   // Buy summary
   function updateBuySummary() {
     const qty = parseInt(document.getElementById('buyQty').value) || 1;
-    const total = (price * qty).toFixed(2);
+    const total = (currentPrice * qty).toFixed(2);
     document.getElementById('buyQtyDisplay').textContent = qty;
     document.getElementById('buyTotal').textContent = '₹' + total;
     document.getElementById('buyQtyHidden').value = qty;
@@ -557,7 +582,7 @@
   // Sell summary
   function updateSellSummary() {
     const qty = parseInt(document.getElementById('sellQty').value) || 1;
-    const total = (price * qty).toFixed(2);
+    const total = (currentPrice * qty).toFixed(2);
     document.getElementById('sellQtyDisplay').textContent = qty;
     document.getElementById('sellTotal').textContent = '₹' + total;
     document.getElementById('sellQtyHidden').value = qty;
@@ -587,7 +612,7 @@
     p = p + (Math.random() - 0.48) * (p * 0.003);
     data.push({ time: now - (78 - i) * 300, value: parseFloat(p.toFixed(2)) });
   }
-  data.push({ time: now, value: price });
+  data.push({ time: now, value: currentPrice });
   lineSeries.setData(data);
 
   window.addEventListener('resize', () => {
@@ -604,6 +629,45 @@
         icon.textContent = '+';
     }
   }
+  async function refreshStockPrice() {
+      try {
+          const response = await fetch("/api/stock/{{ stock.symbol }}/");
+          const data = await response.json();
+          currentPrice = data.current_price;
+          const newPoint = {
+              time: Math.floor(Date.now() / 1000),
+              value: currentPrice
+          };
+          lineSeries.update(newPoint);
+          document.getElementById("livePrice").innerHTML =
+              "₹" + currentPrice.toFixed(2);
+          document.getElementById("prevClose").innerHTML =
+              "₹" + data.previous_close.toFixed(2);
+          document.getElementById("buyPrice").value =
+              "₹" + currentPrice.toFixed(2);
+          document.getElementById("sellPrice").value =
+              "₹" + currentPrice.toFixed(2);
+          document.getElementById("buySummaryPrice").innerHTML =
+              "₹" + currentPrice.toFixed(2);
+          document.getElementById("sellSummaryPrice").innerHTML =
+              "₹" + currentPrice.toFixed(2);
+          const change = document.getElementById("liveChange");
+          if (data.change_percent >= 0) {
+              change.className = "price-change-up";
+              change.innerHTML =
+                  "▲ " + data.change_percent.toFixed(2) + "% today";
+          } else {
+              change.className = "price-change-down";
+              change.innerHTML =
+                  "▼ " + Math.abs(data.change_percent).toFixed(2) + "% today";
+          }
+          updateBuySummary();
+          updateSellSummary();
+      } catch (err) {
+          console.log(err);
+      }
+  }
+  setInterval(refreshStockPrice, 15000);
 </script>
 </body>
 </html>

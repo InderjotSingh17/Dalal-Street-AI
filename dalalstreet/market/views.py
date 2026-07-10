@@ -7,7 +7,7 @@ from decimal import Decimal
 from django.contrib import messages
 from market.missions import check_missions_on_trade
 from market.missions import check_missions_on_watchlist
-
+from django.http import JsonResponse
 
 def landing(request):
     if request.user.is_authenticated:
@@ -389,3 +389,16 @@ def ai_mentor_chat(request):
     except Exception as e:
         from django.http import JsonResponse
         return JsonResponse({'error': str(e)}, status=500)
+
+@login_required(login_url='/login/')
+def stock_price_api(request, symbol):
+    stock = get_object_or_404(Stock, symbol=symbol)
+
+    return JsonResponse({
+        "symbol": stock.symbol,
+        "current_price": float(stock.current_price),
+        "change_percent": float(stock.change_percent),
+        "previous_close": float(stock.previous_close),
+        "day_high": float(stock.day_high),
+        "day_low": float(stock.day_low),
+    })

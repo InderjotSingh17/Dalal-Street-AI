@@ -23,4 +23,5 @@ urlpatterns = [
     path('learn/', views.learn, name='learn'),
     path('ai-mentor/', views.ai_mentor, name='ai_mentor'),
     path('ai-mentor/chat/', views.ai_mentor_chat, name='ai_mentor_chat'),
+    path('api/stock/<str:symbol>/', views.stock_price_api, name='stock_price_api'),
 ]

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "channels",
     'accounts',
     'market',
     'portfolio',
@@ -78,7 +79,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'dalalstreet.wsgi.application'
-
+ASGI_APPLICATION = "dalalstreet.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
@@ -128,4 +129,3 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-ASGI_APPLICATION = "dalalstreet.asgi.application"
