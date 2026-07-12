@@ -6,7 +6,7 @@ from accounts.models import UserProfile
 
 def configure_gemini():
     genai.configure(api_key=settings.GEMINI_API_KEY)
-    return genai.GenerativeModel(model_name='gemini-2.5-flash')
+    return genai.GenerativeModel(model_name='gemini-3.5-flash')
 
 
 def get_stock_context(stock):
