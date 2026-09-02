@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Weekly Review — Dalal Street AI</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#07080f;color:#e8e8f0;font-family:'Segoe UI',sans-serif;}
+    .nav{display:flex;justify-content:space-between;align-items:center;padding:0 32px;height:56px;background:#07080f;border-bottom:0.5px solid rgba(255,255,255,0.07);position:sticky;top:0;z-index:100;}
+    .nav-left{display:flex;align-items:center;gap:32px;}
+    .logo{font-size:16px;font-weight:700;color:#fff;text-decoration:none;}
+    .logo span{color:#00d68f;}
+    .nav-tabs{display:flex;}
+    .nav-tab{padding:0 16px;height:56px;display:flex;align-items:center;font-size:14px;color:rgba(255,255,255,0.5);text-decoration:none;border-bottom:2px solid transparent;}
+    .nav-tab:hover{color:#fff;}
+    .nav-tab.active{color:#fff;border-bottom-color:#00d68f;}
+    .nav-right{display:flex;align-items:center;gap:16px;}
+    .balance-chip{background:#111520;border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 14px;font-size:13px;}
+    .balance-chip span{color:#00d68f;font-weight:700;}
+    .btn-logout{font-size:12px;padding:6px 14px;border:0.5px solid rgba(255,255,255,0.1);border-radius:7px;background:transparent;color:rgba(255,255,255,0.5);text-decoration:none;}
+    .page{max-width:800px;margin:0 auto;padding:32px;}
+    .page-title{font-size:22px;font-weight:800;color:#fff;margin-bottom:24px;}
+    .report-card{background:#0f1018;border:0.5px solid rgba(0,214,143,0.2);border-radius:14px;padding:22px;}
+    .trade-count{font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;}
+    .trend-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;}
+    .trend-improving{background:rgba(0,214,143,0.1);color:#00d68f;}
+    .trend-worsening{background:rgba(255,107,107,0.1);color:#ff6b6b;}
+    .trend-stable{background:rgba(255,193,7,0.1);color:#ffc107;}
+    .trend-not_enough_data{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.4);}
+    .section{background:#111520;border-radius:10px;padding:14px;margin-bottom:12px;}
+    .section-label{font-size:11px;font-weight:700;margin-bottom:6px;}
+    .section-body{font-size:14px;color:rgba(255,255,255,0.7);line-height:1.6;}
+    .summary{font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6;margin-top:8px;}
+    .empty-state{text-align:center;padding:80px 20px;color:rgba(255,255,255,0.3);}
+    .empty-icon{font-size:48px;margin-bottom:16px;}
+    .empty-title{font-size:18px;font-weight:600;color:rgba(255,255,255,0.5);margin-bottom:8px;}
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-left">
+    <a class="logo" href="{% url 'landing' %}">📈 Dalal Street <span>AI</span></a>
+    <div class="nav-tabs">
+      <a class="nav-tab" href="{% url 'dashboard' %}">Explore</a>
+      <a class="nav-tab" href="{% url 'portfolio' %}">Holdings</a>
+      <a class="nav-tab" href="{% url 'orders' %}">Orders</a>
+      <a class="nav-tab" href="{% url 'watchlist' %}">Watchlist</a>
+      <a class="nav-tab" href="{% url 'missions' %}">Missions</a>
+      <a class="nav-tab" href="{% url 'leaderboard' %}">Leaderboard</a>
+      <a class="nav-tab" href="{% url 'mentor' %}">Mentor</a>
+      <a class="nav-tab" href="{% url 'daily_report' %}">Daily Report</a>
+      <a class="nav-tab" href="{% url 'weekly_review' %}">Weekly Review</a>
+      <a class="nav-tab" href="{% url 'learning_profile' %}">My Learning</a>
+      <a class="nav-tab" href="{% url 'learn' %}">Learn</a>
+      <a class="nav-tab" href="{% url 'ai_mentor' %}">AI Chat</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="balance-chip">Balance: <span>₹{{ balance|floatformat:0 }}</span></div>
+    <a class="btn-logout" href="{% url 'logout' %}">Logout</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-title">📊 Weekly Behavioural Review</div>
+
+  {% if review %}
+  <div class="report-card">
+    <div class="trade-count">
+      <span>{{ review.trades_count }} trade(s) this week</span>
+      <span class="trend-badge trend-{{ review.pattern_trend }}">{{ review.pattern_trend|title }}</span>
+    </div>
+
+    {% if review.dominant_pattern %}
+    <div class="section">
+      <div class="section-label" style="color:#ffc107;">🔁 DOMINANT PATTERN</div>
+      <div class="section-body">{{ review.dominant_pattern }}</div>
+    </div>
+    {% endif %}
+
+    <div class="section">
+      <div class="section-label" style="color:#00d68f;">🎯 FOCUS FOR NEXT WEEK</div>
+      <div class="section-body">{{ review.one_focus_area }}</div>
+    </div>
+
+    {% if review.concepts_reinforced %}
+    <div class="section">
+      <div class="section-label" style="color:rgba(255,255,255,0.4);">📚 CONCEPTS REINFORCED</div>
+      {% for c in review.concepts_reinforced %}
+      <div class="section-body">• {{ c }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="summary">{{ review.week_summary }}</div>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">📭</div>
+    <div class="empty-title">No trades this week yet</div>
+    <p>Trade a few times this week to unlock your review.</p>
+  </div>
+  {% endif %}
+</div>
+
+</body>
+</html>
