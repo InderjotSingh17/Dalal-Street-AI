@@ -155,11 +155,22 @@ class LearningEngine:
             return
 
         taught = list(self.profile.concepts_taught)
+        is_first_time = concept_key not in taught
 
         # Add concept if not already taught
-        if concept_key not in taught:
+        if is_first_time:
             taught.append(concept_key)
             self.profile.concepts_taught = taught
+
+        # Phase 9: track recurrence
+        recurrence = dict(self.profile.concept_recurrence)
+        if concept_key not in recurrence:
+            recurrence[concept_key] = {'taught_count': 0, 'recurred_after_teaching': False}
+        else:
+            # This concept is being taught again -> the issue recurred after a prior teaching
+            recurrence[concept_key]['recurred_after_teaching'] = True
+        recurrence[concept_key]['taught_count'] += 1
+        self.profile.concept_recurrence = recurrence
 
         # Increment lesson count
         self.profile.total_lessons_received += 1

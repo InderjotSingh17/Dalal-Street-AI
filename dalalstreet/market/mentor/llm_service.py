@@ -26,12 +26,17 @@ class LLMService:
         parsed = self._parse_json(raw_response)
         if parsed is None:
             return self._get_fallback(event_type)
-        if event_type == EVENT_PORTFOLIO_VIEW:
-            self._save_to_cache(event_type, stock_symbol, parsed)
+
+        # Always log the card for progress tracking (Phase 14), even if not
+        # used for cache-read on buy/sell events.
+        self._save_to_cache(event_type, stock_symbol, parsed)
+
         return parsed
 
     def _call_gemini_with_retry(self, prompt):
         try:
+            import warnings
+            warnings.filterwarnings('ignore', category=FutureWarning, module='google.generativeai')
             import google.generativeai as genai
             genai.configure(api_key=settings.GEMINI_API_KEY)
             model = genai.GenerativeModel(

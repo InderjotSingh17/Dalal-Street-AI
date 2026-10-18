@@ -29,10 +29,11 @@ from market.mentor.constants import (
 
 class PromptBuilder:
 
-    def __init__(self, event_context, learning_context, behaviour_context):
+    def __init__(self, event_context, learning_context, behaviour_context, chosen_signal=None):
         self.event = event_context
         self.learning = learning_context
         self.behaviour = behaviour_context
+        self.chosen_signal = chosen_signal
 
     def build(self):
         """
@@ -62,6 +63,9 @@ class PromptBuilder:
         sections.append(self._system_instruction())
         sections.append(self._user_profile_section())
         sections.append(self._trade_section_buy())
+
+        if self.chosen_signal:
+            sections.append(self._focused_signal_section(self.chosen_signal))
 
         if PILLAR_FUNDAMENTAL in pillars:
             sections.append(self._fundamental_section())
@@ -104,6 +108,9 @@ class PromptBuilder:
         sections.append(self._user_profile_section())
         sections.append(self._trade_section_sell())
 
+        if self.chosen_signal:
+            sections.append(self._focused_signal_section(self.chosen_signal))
+
         if PILLAR_EXIT in pillars:
             sections.append(self._exit_section())
 
@@ -138,6 +145,9 @@ class PromptBuilder:
         sections.append(self._system_instruction())
         sections.append(self._user_profile_section())
         sections.append(self._portfolio_section())
+
+        if self.chosen_signal:
+            sections.append(self._focused_signal_section(self.chosen_signal))
 
         if PILLAR_RISK in pillars:
             sections.append(self._risk_section())
@@ -214,6 +224,16 @@ Sell price: ₹{e.trade_price:.2f}
 Avg buy price: ₹{e.avg_buy_price:.2f}
 P&L: ₹{e.pnl:.0f} ({e.pnl_pct:+.1f}%) — {outcome}
 Today's change: {e.change_percent_today:+.2f}%"""
+
+    def _focused_signal_section(self, chosen_signal):
+        if not chosen_signal:
+            return None
+        return f"""PRIORITY FOCUS FOR THIS TRADE:
+The single most important thing to address is: {chosen_signal.detail}
+Category: {chosen_signal.factor} | Severity: {chosen_signal.severity}
+
+Your educational_insight and concept fields MUST focus on this ONE issue.
+Do not try to cover multiple unrelated concerns — depth over breadth."""
 
     def _fundamental_section(self):
         e = self.event
@@ -414,11 +434,19 @@ Total sectors in portfolio: {len(e.sector_allocation)}"""
     def _learning_section(self):
         l = self.learning
 
+        # If a prioritized signal chose a concept, that overrides the default rotation
+        concept_name = l.concept_name or 'Choose the most relevant'
+        if self.chosen_signal and self.chosen_signal.concept_key:
+            from market.mentor.constants import CONCEPT_LIBRARY
+            concept_data = CONCEPT_LIBRARY.get(self.chosen_signal.concept_key)
+            if concept_data:
+                concept_name = concept_data['name']
+
         lines = [
             f"LEARNING INSTRUCTION:",
             f"User knowledge level: {l.knowledge_level}",
             f"Lessons received so far: {l.concepts_taught_count}",
-            f"Concept to teach this trade: {l.concept_name or 'Choose the most relevant'}",
+            f"Concept to teach this trade: {concept_name}",
         ]
 
         if l.concept_explanation:

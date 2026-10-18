@@ -71,6 +71,7 @@ class LearningProfile(models.Model):
     next_topic = models.CharField(max_length=50, blank=True, default='')
     total_lessons_received = models.IntegerField(default=0)
     last_lesson_date = models.DateField(null=True, blank=True)
+    concept_recurrence = models.JSONField(default=dict)
 
     def __str__(self):
         return f"{self.user.username} — {self.knowledge_level}"

@@ -7,6 +7,7 @@
 
 from portfolio.models import Holding, Order
 from accounts.models import UserProfile
+from django.utils import timezone
 from market.mentor.constants import (
     EVENT_BUY,
     EVENT_SELL,
@@ -69,6 +70,8 @@ class EventContext:
         self.total_pnl = 0
         self.num_holdings = 0
         self.holdings_data = []     # list of dicts
+        self.todays_trades = []
+        self.weeks_trades = []
         self.sector_allocation = {} # sector -> % dict
         self.cash_pct = 0           # % of total in cash
         self.invested_pct = 0       # % of total invested
@@ -193,6 +196,62 @@ class EventEngine:
 
         return context
 
+    def build_daily_report_context(self):
+        """Called for end-of-day report generation."""
+        from market.mentor.constants import EVENT_DAILY_REPORT
+
+        context = EventContext()
+        context.event_type = EVENT_DAILY_REPORT
+        context.user = self.user
+
+        self._fill_user_context(context)
+        self._fill_portfolio_context(context)
+
+        today = timezone.now().date()
+        todays_orders = Order.objects.filter(
+            user=self.user, timestamp__date=today
+        ).select_related('stock').order_by('timestamp')
+
+        context.todays_trades = []
+        for o in todays_orders:
+            context.todays_trades.append({
+                'symbol': o.stock.symbol,
+                'order_type': o.order_type,
+                'quantity': o.quantity,
+                'price': float(o.price),
+                'timestamp': o.timestamp,
+            })
+
+        return context
+
+    def build_weekly_review_context(self):
+        """Called for weekly behavioural review generation."""
+        from market.mentor.constants import EVENT_WEEKLY_REVIEW
+        from datetime import timedelta
+
+        context = EventContext()
+        context.event_type = EVENT_WEEKLY_REVIEW
+        context.user = self.user
+
+        self._fill_user_context(context)
+        self._fill_portfolio_context(context)
+
+        week_ago = timezone.now() - timedelta(days=7)
+        weeks_orders = Order.objects.filter(
+            user=self.user, timestamp__gte=week_ago
+        ).select_related('stock').order_by('timestamp')
+
+        context.weeks_trades = []
+        for o in weeks_orders:
+            context.weeks_trades.append({
+                'symbol': o.stock.symbol,
+                'order_type': o.order_type,
+                'quantity': o.quantity,
+                'price': float(o.price),
+                'timestamp': o.timestamp,
+            })
+
+        return context
     # ----------------------------------------------------------
     # PRIVATE HELPERS
     # ----------------------------------------------------------

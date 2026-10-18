@@ -135,6 +135,12 @@ def buy_stock(request, symbol):
     if not Order.objects.filter(user=request.user).exists():
         xp_to_add += 50
     profile.add_xp(xp_to_add)
+
+    Order.objects.create(
+        user=request.user, stock=stock, order_type='BUY',
+        quantity=quantity, price=stock.current_price,
+        total_amount=total_cost
+    )
     check_missions_on_trade(request.user, profile, quantity)
     # AI Mentor analysis — runs automatically
     # AI Mentor analysis — runs automatically
@@ -178,6 +184,12 @@ def sell_stock(request, symbol):
 
     profile.add_xp(10)
     check_missions_on_trade(request.user, profile, quantity)
+
+    Order.objects.create(
+        user=request.user, stock=stock, order_type='SELL',
+        quantity=quantity, price=stock.current_price,
+        total_amount=total_value
+    )
     # AI Mentor analysis — runs automatically
     from market.mentor.orchestrator import MentorOrchestrator
     mentor = MentorOrchestrator(request.user)
@@ -211,6 +223,72 @@ def portfolio(request):
         'total_pnl': round(total_pnl, 2),
         'total_pnl_pct': round(total_pnl_pct, 2),
         'ai_report': ai_report,
+    })
+
+@login_required(login_url='/login/')
+def daily_report(request):
+    from market.mentor.orchestrator import MentorOrchestrator
+    profile = UserProfile.objects.get(user=request.user)
+
+    mentor = MentorOrchestrator(request.user)
+    report = mentor.on_daily_report()
+
+    return render(request, 'market/daily_report.html', {
+        'balance': profile.balance,
+        'report': report,
+    })
+
+@login_required(login_url='/login/')
+def weekly_review(request):
+    from market.mentor.orchestrator import MentorOrchestrator
+    profile = UserProfile.objects.get(user=request.user)
+
+    mentor = MentorOrchestrator(request.user)
+    review = mentor.on_weekly_review()
+
+    return render(request, 'market/weekly_review.html', {
+        'balance': profile.balance,
+        'review': review,
+    })
+
+@login_required(login_url='/login/')
+def learning_profile_view(request):
+    from accounts.models import LearningProfile, BehaviourProfile
+    from market.mentor.constants import CONCEPT_LIBRARY
+
+    profile = UserProfile.objects.get(user=request.user)
+    lp = LearningProfile.get_or_create_for_user(request.user)
+    bp = BehaviourProfile.get_or_create_for_user(request.user)
+
+    concepts_known = []
+    for key in lp.concepts_taught:
+        concept = CONCEPT_LIBRARY.get(key)
+        if concept:
+            recurrence = lp.concept_recurrence.get(key, {})
+            concepts_known.append({
+                'name': concept['name'],
+                'recurred': recurrence.get('recurred_after_teaching', False),
+            })
+    from market.mentor.progress_tracker import get_decision_quality_trend
+    quality_trend = get_decision_quality_trend(request.user)
+    behaviour_counts = {
+        'Panic Selling': bp.panic_sell_count,
+        'FOMO Buying': bp.fomo_buy_count,
+        'Overtrading': bp.overtrading_count,
+        'Holding Losers': bp.hold_loser_count,
+        'Selling Winners Early': bp.sell_winner_early_count,
+        'Poor Diversification': bp.poor_diversification_count,
+        'Disciplined Holds': bp.disciplined_hold_count,
+    }
+
+    return render(request, 'market/learning_profile.html', {
+        'balance': profile.balance,
+        'knowledge_level': lp.knowledge_level,
+        'total_lessons': lp.total_lessons_received,
+        'concepts_known': concepts_known,
+        'behaviour_counts': behaviour_counts,
+        'dominant_weakness': bp.get_dominant_weakness(),
+        'quality_trend': quality_trend,
     })
 
 @login_required(login_url='/login/')

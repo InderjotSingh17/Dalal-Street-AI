@@ -144,14 +144,21 @@ class BehaviourEngine:
                 f"compound over time."
             )
             self.profile.sell_winner_early_count += 1
-
-        # Logical exit — reward good behaviour
-        elif pnl_pct > 10:
+        elif self._is_quick_big_win(stock, pnl_pct):
+            context.detected_pattern = BEHAVIOUR_FOMO_BUY  # reuse existing category
+            context.pattern_explanation = (
+                f"You gained +{pnl_pct:.1f}% on {stock.symbol} in under 3 days. "
+                f"That's a great outcome, but a fast, large move like this is often "
+                f"momentum or luck rather than a well-reasoned exit. Be cautious about "
+                f"assuming this approach will consistently work."
+            )
+        # Logical exit — reward good behaviour (only if held with patience, not a quick flip)
+        elif self._is_logical_exit(stock, pnl_pct):
             context.detected_pattern = BEHAVIOUR_LOGICAL_EXIT
             context.pattern_explanation = (
-                f"You booked a solid +{pnl_pct:.1f}% gain on {stock.symbol}. "
-                f"Well-timed exits based on targets rather than emotion "
-                f"are a sign of disciplined investing."
+                f"You booked a solid +{pnl_pct:.1f}% gain on {stock.symbol} after "
+                f"holding it, rather than flipping it quickly. Giving a thesis time "
+                f"to play out is a sign of disciplined investing."
             )
             self.profile.disciplined_hold_count += 1
 
@@ -242,6 +249,24 @@ class BehaviourEngine:
 
         return recent_buy
 
+    def _is_logical_exit(self, stock, pnl_pct):
+        """
+        A profitable exit only counts as 'logical' if it wasn't a quick flip.
+        Profit alone doesn't prove good decision-making.
+        """
+        if pnl_pct <= 10:
+            return False
+
+        last_buy = Order.objects.filter(
+            user=self.user, stock=stock, order_type='BUY'
+        ).order_by('-timestamp').first()
+
+        if not last_buy:
+            return False
+
+        days_held = (timezone.now() - last_buy.timestamp).days
+        return days_held >= 3
+
     def _is_selling_winner_early(self, pnl_pct, stock):
         """
         Selling at small profit while stock still has strong fundamentals.
@@ -259,6 +284,25 @@ class BehaviourEngine:
             return True
 
         return False
+
+    def _is_quick_big_win(self, stock, pnl_pct):
+        """
+        Large profit (15%+) but held less than 3 days — likely luck/momentum,
+        not a disciplined decision. Distinct from logical_exit (patient hold)
+        and selling_winner_early (small profit, still-strong fundamentals).
+        """
+        if pnl_pct < 15:
+            return False
+
+        last_buy = Order.objects.filter(
+            user=self.user, stock=stock, order_type='BUY'
+        ).order_by('-timestamp').first()
+
+        if not last_buy:
+            return False
+
+        days_held = (timezone.now() - last_buy.timestamp).days
+        return days_held < 3
 
     def _is_overtrading(self):
         """More than OVERTRADING_DAILY trades today."""

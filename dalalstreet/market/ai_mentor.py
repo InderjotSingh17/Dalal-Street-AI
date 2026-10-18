@@ -1,12 +1,16 @@
+import warnings
+warnings.filterwarnings('ignore', category=FutureWarning, module='google.generativeai')
 import google.generativeai as genai
 from django.conf import settings
 from portfolio.models import Holding, Order
 from accounts.models import UserProfile
 
+import logging
+logger = logging.getLogger(__name__)
 
 def configure_gemini():
     genai.configure(api_key=settings.GEMINI_API_KEY)
-    return genai.GenerativeModel(model_name='gemini-3.5-flash')
+    return genai.GenerativeModel(model_name='gemini-3.6-flash')
 
 
 def get_stock_context(stock):
@@ -250,7 +254,10 @@ def ask_ai_mentor(user, user_message, chat_history=None):
     """Conversational chat — used by the AI Chat page"""
     model = configure_gemini()
     portfolio = get_portfolio_context(user)
-
+    from market.mentor.learning_engine import LearningEngine
+    from market.mentor.behaviour_engine import BehaviourEngine
+    learning_summary = LearningEngine(user).get_knowledge_summary()
+    behaviour_summary = BehaviourEngine(user).get_coaching_summary()
     history_text = ""
     if chat_history:
         for msg in chat_history[-10:]:
@@ -261,6 +268,16 @@ def ask_ai_mentor(user, user_message, chat_history=None):
 
 USER'S PORTFOLIO:
 {portfolio}
+
+USER'S LEARNING PROFILE:
+Knowledge level: {learning_summary['level']}
+{learning_summary['already_knows']}
+
+USER'S BEHAVIOURAL HISTORY:
+{behaviour_summary['summary']}
+Dominant weakness: {behaviour_summary.get('dominant_weakness') or 'None identified yet'}
+
+Do not re-explain concepts the user already knows unless they specifically ask about them again.
 
 RECENT CONVERSATION:
 {history_text or 'This is the start of the conversation.'}
@@ -282,5 +299,5 @@ Rules:
         response = model.generate_content(prompt)
         return response.text.strip()
     except Exception as e:
-        print(f"AI MENTOR CHAT ERROR: {e}")
+        logger.error(f"AI Mentor chat error: {e}")
         return "Sorry, I'm having trouble connecting right now. Please try again in a moment."

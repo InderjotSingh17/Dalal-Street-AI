@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Learning Profile — Dalal Street AI</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#07080f;color:#e8e8f0;font-family:'Segoe UI',sans-serif;}
+    .nav{display:flex;justify-content:space-between;align-items:center;padding:0 32px;height:56px;background:#07080f;border-bottom:0.5px solid rgba(255,255,255,0.07);position:sticky;top:0;z-index:100;}
+    .nav-left{display:flex;align-items:center;gap:32px;}
+    .logo{font-size:16px;font-weight:700;color:#fff;text-decoration:none;}
+    .logo span{color:#00d68f;}
+    .nav-tabs{display:flex;}
+    .nav-tab{padding:0 16px;height:56px;display:flex;align-items:center;font-size:14px;color:rgba(255,255,255,0.5);text-decoration:none;border-bottom:2px solid transparent;}
+    .nav-tab:hover{color:#fff;}
+    .nav-tab.active{color:#fff;border-bottom-color:#00d68f;}
+    .nav-right{display:flex;align-items:center;gap:16px;}
+    .balance-chip{background:#111520;border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 14px;font-size:13px;}
+    .balance-chip span{color:#00d68f;font-weight:700;}
+    .btn-logout{font-size:12px;padding:6px 14px;border:0.5px solid rgba(255,255,255,0.1);border-radius:7px;background:transparent;color:rgba(255,255,255,0.5);text-decoration:none;}
+    .page{max-width:800px;margin:0 auto;padding:32px;}
+    .page-title{font-size:22px;font-weight:800;color:#fff;margin-bottom:24px;}
+    .card{background:#0f1018;border:0.5px solid rgba(255,255,255,0.07);border-radius:14px;padding:22px;margin-bottom:20px;}
+    .card-title{font-size:13px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px;}
+    .level-badge{font-size:20px;font-weight:800;color:#00d68f;}
+    .concept-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid rgba(255,255,255,0.05);font-size:14px;}
+    .concept-row:last-child{border-bottom:none;}
+    .recurred-tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(255,193,7,0.1);color:#ffc107;}
+    .behaviour-row{display:flex;justify-content:space-between;padding:6px 0;font-size:14px;color:rgba(255,255,255,0.6);}
+    .behaviour-count{font-weight:700;color:#fff;}
+    .empty-note{color:rgba(255,255,255,0.35);font-size:13px;font-style:italic;}
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-left">
+    <a class="logo" href="{% url 'landing' %}">📈 Dalal Street <span>AI</span></a>
+    <div class="nav-tabs">
+      <a class="nav-tab" href="{% url 'dashboard' %}">Explore</a>
+      <a class="nav-tab" href="{% url 'portfolio' %}">Holdings</a>
+      <a class="nav-tab" href="{% url 'orders' %}">Orders</a>
+      <a class="nav-tab" href="{% url 'watchlist' %}">Watchlist</a>
+      <a class="nav-tab" href="{% url 'missions' %}">Missions</a>
+      <a class="nav-tab" href="{% url 'leaderboard' %}">Leaderboard</a>
+      <a class="nav-tab" href="{% url 'mentor' %}">Mentor</a>
+      <a class="nav-tab" href="{% url 'daily_report' %}">Daily Report</a>
+      <a class="nav-tab" href="{% url 'weekly_review' %}">Weekly Review</a>
+      <a class="nav-tab" href="{% url 'learning_profile' %}">My Learning</a>
+      <a class="nav-tab" href="{% url 'learn' %}">Learn</a>
+      <a class="nav-tab" href="{% url 'ai_mentor' %}">AI Chat</a>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="balance-chip">Balance: <span>₹{{ balance|floatformat:0 }}</span></div>
+    <a class="btn-logout" href="{% url 'logout' %}">Logout</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-title">🎓 My Learning Profile</div>
+
+  <div class="card">
+    <div class="card-title">Knowledge Level</div>
+    <div class="level-badge">{{ knowledge_level|title }}</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.4);margin-top:6px;">{{ total_lessons }} lessons received</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Concepts Learned</div>
+    {% if concepts_known %}
+      {% for c in concepts_known %}
+      <div class="concept-row">
+        <span>{{ c.name }}</span>
+        {% if c.recurred %}<span class="recurred-tag">Needs reinforcement</span>{% endif %}
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-note">No concepts taught yet — start trading to unlock lessons.</div>
+    {% endif %}
+  </div>
+  <div class="card">
+    <div class="card-title">Decision Quality Trend</div>
+    {% if quality_trend.trend == 'not_enough_data' %}
+      <div class="empty-note">Make a few more trades to see your trend.</div>
+    {% else %}
+      <div style="font-size:18px;font-weight:700;color:{% if quality_trend.trend == 'improving' %}#00d68f{% elif quality_trend.trend == 'declining' %}#ff6b6b{% else %}#ffc107{% endif %};">
+        {{ quality_trend.trend|title }}
+      </div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.4);margin-top:6px;">
+        Average trade quality: {{ quality_trend.average }}/10
+        (early: {{ quality_trend.first_half_avg }} → recent: {{ quality_trend.second_half_avg }})
+      </div>
+    {% endif %}
+  </div>
+  <div class="card">
+    <div class="card-title">Behavioural Patterns</div>
+    {% for name, count in behaviour_counts.items %}
+    <div class="behaviour-row">
+      <span>{{ name }}</span>
+      <span class="behaviour-count">{{ count }}</span>
+    </div>
+    {% endfor %}
+    {% if dominant_weakness %}
+    <div style="margin-top:12px;font-size:13px;color:#ffc107;">⚠️ Dominant weakness: {{ dominant_weakness|title }}</div>
+    {% endif %}
+  </div>
+</div>
+
+</body>
+</html>

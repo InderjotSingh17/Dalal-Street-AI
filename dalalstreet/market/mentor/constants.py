@@ -324,7 +324,23 @@ SELL_CARD_SCHEMA = {
     "concept_explanation": "string",
     "next_steps": "string",
 }
-
+DAILY_REPORT_SCHEMA = {
+    "best_decision": "string — describe the best trade/decision today and why",
+    "best_decision_stock": "string or null — stock symbol if applicable",
+    "biggest_mistake": "string or null — the weakest decision today and why",
+    "biggest_mistake_stock": "string or null",
+    "concepts_to_revise": ["list of 1-2 concept names based on today's trades"],
+    "day_summary": "string — 2-3 sentence overall summary of today's trading",
+    "trades_count": "integer",
+}
+WEEKLY_REVIEW_SCHEMA = {
+    "week_summary": "string — 2-3 sentence overview of the week's trading behavior",
+    "dominant_pattern": "string or null — the most repeated behavioral pattern this week",
+    "pattern_trend": "improving | worsening | stable | not_enough_data",
+    "trades_count": "integer",
+    "concepts_reinforced": ["list of concepts that appeared multiple times this week"],
+    "one_focus_area": "string — the single most important thing to work on next week",
+}
 PORTFOLIO_CARD_SCHEMA = {
     "health_score": "integer 1-100",
     "health_label": "Excellent | Good | Fair | Poor | Critical",
@@ -349,6 +365,6 @@ CACHE_DAILY_REPORT_MINUTES = 1440  # 24 hours
 # ------------------------------------------------------------
 # LLM SETTINGS
 # ------------------------------------------------------------
-LLM_MODEL = 'gemini-2.5-flash'
+LLM_MODEL = 'gemini-3.6-flash'
 LLM_MAX_RETRIES = 2
 LLM_TEMPERATURE = 0.3  # Lower = more consistent, less creative
