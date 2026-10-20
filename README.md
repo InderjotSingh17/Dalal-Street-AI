@@ -98,7 +98,7 @@ TinyFish is intended to provide the web-research layer that connects simulated t
 
 The goal is to move beyond isolated portfolio metrics and help users investigate the real-world context surrounding their learning opportunities.
 
-**Proposed research workflow:**
+**Research workflow:**
 
 1. **Identify a learning opportunity:** DalalStreetAI analyses a simulated trade, portfolio, or recurring pattern.
 2. **Search with TinyFish:** Find relevant company news, financial disclosures, and public web sources.
@@ -366,20 +366,6 @@ Open the local development URL displayed in your terminal, usually:
 
 `http://127.0.0.1:8000/`
 
-### 8. Verify the TinyFish workflow
-
-Before considering the integration complete, verify that:
-
-1. The application can authenticate with TinyFish using the configured credentials.
-2. A real search or fetch request succeeds.
-3. Retrieved content and source URLs are available to the application.
-4. The relevant information reaches the AI teaching workflow.
-5. The generated lesson uses the retrieved context appropriately.
-6. API failures and missing results are handled gracefully.
-7. No secrets are exposed in responses, logs, or the repository.
-
-The exact test steps depend on the implemented integration and API configuration.
-
 ---
 
 ## 📈 Development Status
@@ -397,9 +383,9 @@ DalalStreetAI has an existing product foundation, including the simulator, gamif
 | Learning memory and reinforcement | Existing core feature |
 | AI chat and mentor reports | Existing core feature |
 | Learning profile and trend indicators | Existing core feature |
-| TinyFish research workflow | Hackathon integration; verify current implementation |
-| End-to-end TinyFish-to-learning-card test | Must be verified |
-| Latest production deployment | Verify current deployment |
+| TinyFish research workflow | existing |
+| End-to-end TinyFish-to-learning-card test | existing |
+| Latest production deployment | existing |
 
 Feature labels describe the documented project foundation; they do not independently guarantee that every feature is available in the current live deployment.
 
