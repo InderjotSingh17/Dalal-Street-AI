@@ -1,35 +1,45 @@
-# 📈 Dalal Street AI
+# 📈 DalalStreetAI
 ### India's AI-Powered Stock Market Learning Platform
 
 **Learn investing by doing. Build better decisions without risking real money.**
 
-Dalal Street AI is a gamified stock market simulator designed for beginner investors in India. It lets users trade real NSE-listed stocks using virtual money while an AI-powered mentor analyzes their decisions and teaches them how to think critically about investing.
+DalalStreetAI is a gamified stock market learning platform designed for beginner investors in India. It enables users to explore 425+ NSE-listed stocks, practise trading with virtual money, analyse portfolio decisions, and learn through personalized AI mentorship.
 
-Unlike traditional stock simulators and stock-tip chatbots, Dalal Street AI focuses on **improving the decision-making process, not predicting stock prices or recommending trades.**
+Unlike traditional stock simulators and stock-tip chatbots, DalalStreetAI focuses on **decision quality, financial literacy, and behavioural learning—not stock-price predictions or buy/sell recommendations.**
 
-🌐 **Live Demo:** [Try Dalal Street AI](https://dalal-street-ai.onrender.com)  
+Our hackathon direction adds **TinyFish-powered web research** to connect simulated trading decisions with relevant company news, financial disclosures, and other public information, helping learners understand real-world context.
+
+🌐 **Live Demo:** [Try DalalStreetAI](https://dalal-street-ai.onrender.com)  
 💻 **GitHub Repository:** [DalalStreetAI](https://github.com/InderjotSingh17/DalalStreetAI)
 
 ---
 
 ## 🎯 The Problem
 
-Beginner investors often face two challenges:
+Beginner investors often face four challenges:
 
-- **Learning without practice:** Articles and courses teach concepts but rarely provide personalized feedback based on real decisions.
-- **Practicing with real money:** New investors may make uninformed decisions before understanding valuation, diversification, risk, or behavioral biases.
+- **Theory without practice:** Courses and articles explain market concepts but rarely provide personalized feedback on actual decisions.
+- **Real money, real risk:** Beginners may enter the market without understanding valuation, diversification, risk, or behavioural biases.
+- **Profit doesn't always mean a good decision:** A profitable trade can result from luck, while a well-reasoned decision can still lose money.
+- **Generic financial guidance:** Traditional learning tools rarely connect an individual's trading history, portfolio, behaviour, and relevant company information.
 
-Dalal Street AI bridges this gap with a realistic trading simulator, virtual capital, and an AI mentor that turns actual trading decisions into personalized learning experiences.
+### The core gap
+
+Beginners need more than stock tips. They need to understand **why an investment decision makes sense, what risks to consider, and what they can learn from it—before risking real money.**
 
 ## 💡 Our Solution
 
-Dalal Street AI combines three core ideas:
+DalalStreetAI combines stock market simulation, personalized AI mentorship, gamified learning, and a research-oriented learning experience.
 
-- 📊 **Stock Market Simulator:** Practice trading real NSE-listed stocks with virtual money.
-- 🧠 **AI Teaching Engine:** Receive personalized lessons based on actual trades, portfolio data, and behavioral patterns.
-- 🎮 **Gamified Learning:** Earn XP, complete missions, progress through levels, and compete on a leaderboard.
+### Our core principles
 
-The goal isn't to make users trade more. It's to help them become more informed and disciplined investors.
+- 📊 **Practise without real-money risk:** Explore NSE-listed stocks using virtual capital.
+- 🧠 **Understand your decisions:** Analyse trades, portfolio concentration, valuation, risk, and behaviour.
+- 🌐 **Connect decisions with real-world context:** Use the planned TinyFish research layer to retrieve relevant public information.
+- 🎯 **Learn one important concept at a time:** Prioritize the most relevant learning opportunity instead of overwhelming users.
+- 🔁 **Build continuity:** Use learning memory to track previously taught concepts and recurring patterns.
+
+The goal is not to encourage more trading. It is to help people develop better financial decision-making habits.
 
 ---
 
@@ -40,64 +50,96 @@ The goal isn't to make users trade more. It's to help them become more informed 
 - Explore **425+ NSE-listed stocks**.
 - Search, filter, and sort stocks by sector, price, price change, and market capitalization.
 - View market indices, including NIFTY 50, SENSEX, and BANKNIFTY.
-- Analyze stock fundamentals such as P/E, EPS, ROE, P/B, Debt-to-Equity, dividend yield, and market capitalization.
+- Explore stock fundamentals such as P/E, EPS, ROE, P/B, debt-to-equity, dividend yield, and market capitalization.
 - View interactive stock price charts and 52-week ranges.
-- Execute virtual buy and sell orders.
+- Execute simulated buy and sell orders using virtual money.
 - Track holdings, portfolio valuation, profit and loss, and sector allocation.
 - Maintain a personal watchlist and review order history.
-- Explore contextual explanations of financial metrics using a stock's actual data.
+- Explore contextual explanations of financial metrics using stock data.
 
 ### 🧠 2. Event-Driven AI Teaching Engine
 
-The AI Teaching Engine is the core differentiator of Dalal Street AI.
+The AI Teaching Engine is the core differentiator of DalalStreetAI.
 
-Instead of waiting for users to ask questions, it responds to important events such as buying a stock, selling a stock, or viewing a portfolio.
+Rather than waiting for a user to ask a question, the system is designed to respond to meaningful events such as buying a stock, selling a stock, or viewing a portfolio.
 
-**How it works:**
+**How the teaching pipeline works:**
 
-1. **Event Capture:** Captures trade details and the user's portfolio context.
-2. **Analysis Engine:** Evaluates valuation, fundamentals, concentration, entry timing, risk, and behavioral patterns.
-3. **Prioritization:** Selects the single most important issue to address.
-4. **Contextual Teaching:** Uses Google Gemini to explain the issue in plain language, grounded in the user's actual decision and financial data.
-5. **Learning Memory:** Records concepts already taught and identifies recurring mistakes in future decisions.
+1. **Event Capture:** Capture trade details and portfolio context.
+2. **Analysis Engine:** Evaluate fundamentals, valuation, concentration, entry timing, risk, and potential behavioural patterns.
+3. **Learning Engine:** Consider previously taught concepts and recurring learning needs.
+4. **Prioritization:** Select the most important learning opportunity using deterministic logic.
+5. **Contextual Teaching:** Use Google Gemini to explain the selected concept in accessible language.
+6. **Learning Memory:** Record concepts already taught and use historical patterns to inform future lessons.
 
-The result is a focused, personalized lesson rather than a generic financial explanation.
+The result is a focused, personalized learning experience rather than another generic financial chatbot.
 
 ### 🎯 3. Decision Quality Over Profit
 
-A profitable trade isn't necessarily a good decision, and a losing trade isn't necessarily a bad one.
+A profitable trade is not necessarily a good decision, and a losing trade is not necessarily a bad decision.
 
-Dalal Street AI evaluates the reasoning behind a decision rather than judging it solely by its financial outcome.
+DalalStreetAI focuses on the reasoning, risk awareness, and behaviour behind simulated trading decisions rather than judging them solely by their financial outcome.
 
-The system identifies potential behavioral patterns such as:
+Potential patterns to analyse include:
 
 - FOMO buying
 - Panic selling
 - Overtrading
 - Premature profit-taking
 - Sector concentration
-- Disciplined holding behavior
+- Entry timing and valuation awareness
+- Disciplined holding behaviour
 
-### 🎮 4. Gamification System
+These are learning signals, not clinical or definitive assessments of a user's behaviour.
 
-- Earn experience points through trading activity and daily engagement.
+### 🌐 4. TinyFish-Powered Web Research — Hackathon Integration
+
+TinyFish is intended to provide the web-research layer that connects simulated trading decisions with relevant public financial information.
+
+The goal is to move beyond isolated portfolio metrics and help users investigate the real-world context surrounding their learning opportunities.
+
+**Proposed research workflow:**
+
+1. **Identify a learning opportunity:** DalalStreetAI analyses a simulated trade, portfolio, or recurring pattern.
+2. **Search with TinyFish:** Find relevant company news, financial disclosures, and public web sources.
+3. **Fetch relevant content:** Retrieve useful source information for further analysis.
+4. **Generate a contextual lesson:** Google Gemini combines the user's simulated trading context with retrieved information.
+5. **Present evidence and uncertainty:** Show source links and explain what the information may mean, what remains uncertain, and what the learner could investigate next.
+
+**Example use case**
+
+A beginner purchases a stock without researching recent company developments.
+
+DalalStreetAI identifies an opportunity to teach research and decision-making. TinyFish can search for relevant public information, while the AI Teaching Engine uses the retrieved evidence to explain how those developments may relate to the learner's decision.
+
+News headlines are not treated as proof of why a stock moved, and retrieved information is not used to predict future returns.
+
+> **Implementation note:** TinyFish is part of the hackathon integration plan. The actual workflow, API configuration, and end-to-end functionality must be verified against the current code before being represented as fully operational.
+
+### 🎮 5. Gamified Learning
+
+- Earn experience points through supported activities.
 - Progress through seven experience levels, from Beginner to Legend.
-- Complete nine daily and one-time missions.
+- Complete daily and one-time missions.
 - Compete with other users on a portfolio-value leaderboard.
 
-### 💬 5. AI Portfolio Mentor
+Gamification is intended to make financial learning more engaging without making trading frequency the primary measure of success.
 
-Ask questions about investing concepts, portfolio concentration, risk, and trading behavior.
+### 💬 6. AI Portfolio Mentor
 
-The conversational mentor has access to relevant portfolio and trading history and takes previously taught concepts into account to reduce repetitive explanations.
+Users can ask questions about investing concepts, portfolio concentration, risk, and trading behaviour.
 
-### 📅 6. Daily and Weekly Reports
+The conversational mentor is designed to use relevant portfolio and trading history, along with previously taught concepts, to provide more contextual explanations and reduce unnecessary repetition.
 
-- **Daily Mentor Report:** Reviews the day's best decision, biggest mistake, and concepts worth revisiting.
-- **Weekly Behavioural Review:** Identifies recurring patterns and provides a focused area for improvement.
-- **Learning Profile:** Tracks concepts taught, reinforced lessons, behavioral patterns, and decision-quality trends.
+### 📅 7. Daily and Weekly Learning Reports
 
-### 🛡️ 7. Reliability and Graceful Fallbacks
+- **Daily Mentor Report:** Reviews the day's notable decisions, potential mistakes, and concepts worth revisiting.
+- **Weekly Behavioural Review:** Highlights recurring patterns and areas for improvement.
+- **Learning Profile:** Tracks concepts taught, reinforced lessons, behavioural patterns, and decision-quality trends.
+
+### 🛡️ 8. Reliability and Graceful Fallbacks
+
+The existing platform architecture includes reliability-oriented features such as:
 
 - Retry logic for AI service failures.
 - Response validation before AI-generated content reaches the interface.
@@ -105,35 +147,99 @@ The conversational mentor has access to relevant portfolio and trading history a
 - Caching to reduce unnecessary repeated AI requests.
 - Environment-based management of API keys and database credentials.
 
+The TinyFish integration should follow similar principles, including handling failed requests, missing sources, and unavailable external services.
+
+---
+
+## 🔄 TinyFish Research Workflow
+
+```mermaid
+flowchart TD
+    A[Simulated Trade or Portfolio Event]
+    B[DalalStreetAI Analysis Engine]
+    C[Learning Opportunity Prioritizer]
+    D[TinyFish Web Search]
+    E[Fetch Relevant Public Sources]
+    F[Gemini AI Teaching Engine]
+    G[Personalized Learning Card]
+    H[Source Links and Uncertainty]
+    I[Learning Memory]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    C --> F
+    F --> G
+    G --> H
+    G --> I
+```
+
+The workflow is designed to connect three elements:
+
+**Personal context + external evidence + focused AI teaching.**
+
+Python-based analysis selects the learning opportunity. TinyFish supplies relevant web research, and Gemini generates a contextual explanation. The system is designed for financial education rather than automated investment decisions.
+
 ---
 
 ## 🏗️ System Architecture
 
 ```mermaid
 flowchart TD
-    A[User Action] --> B[Django Application]
-    B --> C[Trading and Portfolio Logic]
-    C --> D[Trade Event Capture]
-    D --> E[Analysis Engine]
-    E --> F[Behavior Engine]
-    E --> G[Learning Engine]
-    F --> H[Issue Prioritizer]
+    A[User Interaction]
+    B[Django Application]
+    C[Trading and Portfolio Logic]
+    D[Event Capture]
+    E[Analysis Engine]
+    F[Behaviour Engine]
+    G[Learning Engine]
+    H[Learning Opportunity Prioritizer]
+    I[TinyFish Research Layer]
+    J[Retrieved Sources]
+    K[Prompt Builder]
+    L[Google Gemini API]
+    M[Response Validation]
+    N[Personalized Mentor Card]
+    O[Learning Memory]
+    P[(PostgreSQL)]
+    Q[Graceful Fallback]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    E --> G
+    F --> H
     G --> H
-    H --> I[Prompt Builder]
-    I --> J[Google Gemini API]
-    J --> K[Response Validation]
-    K --> L[Personalized Mentor Card]
-    L --> M[Learning Memory]
-    C <--> N[(PostgreSQL)]
-    M <--> N
-    K --> O[Graceful Fallback]
+    H --> I
+    I --> J
+    H --> K
+    J --> K
+    K --> L
+    L --> M
+    M --> N
+    N --> O
+    O <--> P
+    C <--> P
+    M --> Q
 ```
 
-The analytical logic remains in Python. The AI model is used primarily to explain a selected teaching point in natural language rather than independently making financial decisions.
+### Architecture principles
+
+- **Deterministic analysis:** Python-based logic identifies potential learning opportunities.
+- **Contextual AI:** Gemini explains selected concepts rather than independently making financial decisions.
+- **Evidence-oriented research:** TinyFish is intended to retrieve relevant public information for contextual lessons.
+- **Learning continuity:** Learning memory tracks concepts and recurring patterns.
+- **Graceful degradation:** The platform should remain useful when external AI or research services are unavailable.
+
+*The TinyFish branch represents the planned integration architecture until verified in the running application.*
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Technology Stack
 
 | Component | Technology |
 |---|---|
@@ -141,7 +247,8 @@ The analytical logic remains in Python. The AI model is used primarily to explai
 | Frontend | HTML, CSS, JavaScript, Django Templates |
 | Database | PostgreSQL, SQLite fallback |
 | Market Data | Yahoo Finance via `yfinance` |
-| AI / LLM | Google Gemini API |
+| AI Teaching Engine | Google Gemini API |
+| Web Research | TinyFish Search and Fetch capabilities |
 | Charts | Chart.js |
 | Task Scheduling | APScheduler |
 | Deployment | Render |
@@ -151,34 +258,36 @@ The analytical logic remains in Python. The AI model is used primarily to explai
 
 ## 🧩 AI Teaching Engine Modules
 
-The Teaching Engine is organized into separate components coordinated through a central orchestrator.
+The Teaching Engine separates analytical logic from AI-generated explanations.
 
 | Module | Responsibility |
 |---|---|
 | Event Engine | Captures trade and portfolio events |
 | Learning Engine | Tracks taught concepts and selects future lessons |
-| Behaviour Engine | Detects behavioral patterns from trading history |
-| Analysis Engine | Identifies valuation, risk, concentration, and behavioral issues |
+| Behaviour Engine | Analyses potential behavioural patterns from trading history |
+| Analysis Engine | Identifies valuation, risk, concentration, and behavioural issues |
 | Prioritizer | Selects the highest-priority teaching point |
 | Prompt Builder | Builds focused instructions for the AI model |
 | LLM Service | Handles AI requests, retries, validation, and caching |
 | Card Generator | Produces consistent mentor-card responses |
-| Orchestrator | Coordinates the pipeline through a single entry point |
+| Orchestrator | Coordinates the teaching pipeline |
+| TinyFish Research Layer | Intended to search and retrieve relevant public web information |
 
-This modular architecture separates deterministic financial analysis from AI-generated explanations, making the system easier to maintain and extend.
+This modular architecture supports maintainability and makes it possible to extend the platform with additional research sources and learning capabilities.
 
 ---
 
 ## 🚀 Getting Started
 
-Follow these steps to run Dalal Street AI locally.
+Follow these steps to run DalalStreetAI locally.
 
 ### Prerequisites
 
 - Python installed
 - Git installed
-- A PostgreSQL database, or SQLite for local development
-- A Google Gemini API key for AI-powered features
+- PostgreSQL database, or SQLite for local development
+- Google Gemini API key for AI-powered features
+- TinyFish API access for the research integration
 
 ### 1. Clone the repository
 
@@ -213,9 +322,9 @@ pip install -r requirements.txt
 
 ### 4. Configure environment variables
 
-Create a `.env` file in the project's root directory and configure the variables expected by your Django settings.
+Create a `.env` file in the project root and configure the variables expected by your Django settings and integration code.
 
-For example:
+Example:
 
 ```env
 SECRET_KEY=your_django_secret_key
@@ -224,9 +333,16 @@ GEMINI_API_KEY=your_gemini_api_key
 DATABASE_URL=your_database_url
 ```
 
-Use the actual variable names expected by your project configuration. If the project supports SQLite fallback, configure the database accordingly.
+Configure TinyFish credentials using the environment-variable names required by your actual TinyFish integration code. Do not assume a variable name unless the application implements it.
 
-**Important:** Never commit your `.env` file, production credentials, or API keys to GitHub.
+If the project supports SQLite fallback, configure the database accordingly.
+
+**Security reminders:**
+
+- Never commit `.env` files or API keys to GitHub.
+- Keep production credentials outside source control.
+- Use environment variables for deployment secrets.
+- Never expose private API keys in frontend JavaScript or public logs.
 
 ### 5. Apply database migrations
 
@@ -250,64 +366,139 @@ Open the local development URL displayed in your terminal, usually:
 
 `http://127.0.0.1:8000/`
 
+### 8. Verify the TinyFish workflow
+
+Before considering the integration complete, verify that:
+
+1. The application can authenticate with TinyFish using the configured credentials.
+2. A real search or fetch request succeeds.
+3. Retrieved content and source URLs are available to the application.
+4. The relevant information reaches the AI teaching workflow.
+5. The generated lesson uses the retrieved context appropriately.
+6. API failures and missing results are handled gracefully.
+7. No secrets are exposed in responses, logs, or the repository.
+
+The exact test steps depend on the implemented integration and API configuration.
+
+---
+
+## 📈 Development Status
+
+DalalStreetAI has an existing product foundation, including the simulator, gamification, AI Teaching Engine, learning memory, and learning reports. Production status should be confirmed against the current deployment.
+
+| Component | Status |
+|---|---|
+| Stock simulator, portfolio, and orders | Existing core feature |
+| Watchlist and stock fundamentals | Existing core feature |
+| Gamification and leaderboard | Existing core feature |
+| Rule-based portfolio analysis | Existing core feature |
+| AI Teaching Engine | Existing core feature |
+| Decision-quality analysis | Existing core feature |
+| Learning memory and reinforcement | Existing core feature |
+| AI chat and mentor reports | Existing core feature |
+| Learning profile and trend indicators | Existing core feature |
+| TinyFish research workflow | Hackathon integration; verify current implementation |
+| End-to-end TinyFish-to-learning-card test | Must be verified |
+| Latest production deployment | Verify current deployment |
+
+Feature labels describe the documented project foundation; they do not independently guarantee that every feature is available in the current live deployment.
+
+---
+
+## 🧪 How We Plan to Evaluate Impact
+
+DalalStreetAI aims to measure whether users become more informed, not simply whether they execute more trades.
+
+Potential evaluation metrics include:
+
+- Improvement in pre- and post-learning assessment scores.
+- Reduction in repeated behavioural mistakes during simulated trading.
+- Percentage of users completing learning journeys.
+- User feedback on the relevance and clarity of personalized lessons.
+- Percentage of research-assisted lessons with usable source links.
+- Reliability of the TinyFish research workflow and its graceful fallback behaviour.
+
+These are proposed evaluation metrics, not measured results.
+
 ---
 
 ## 🔐 Financial Safety and Design Principles
 
-Dalal Street AI is designed as an educational simulation.
+DalalStreetAI is designed as an educational simulation.
 
 - Trades use virtual money rather than real capital.
 - The platform focuses on financial literacy and decision-making.
-- The Teaching Engine does not predict stock-price movements.
-- It does not recommend specific stocks to buy or sell.
-- AI-generated explanations supplement deterministic analysis rather than replacing it.
+- The Teaching Engine is not designed to predict stock-price movements.
+- The platform does not recommend specific stocks to buy or sell.
+- AI-generated explanations supplement analytical logic rather than replacing it.
+- External information should be presented with context and uncertainty.
+- News and disclosures should not be treated as proof of causation or future performance.
 
-**Disclaimer:** Dalal Street AI is an educational project, not a financial advisory service. Market data may be delayed, incomplete, or inaccurate. Nothing on the platform should be interpreted as a recommendation to invest real money.
-
----
-
-## 📈 Current Development Status
-
-The core product features have been implemented and tested, including the simulator, gamification, AI Teaching Engine, learning memory, reports, and learning profile.
-
-| Component | Status |
-|---|---|
-| Stock simulator, portfolio, and orders | Complete |
-| Watchlist and stock fundamentals | Complete |
-| Gamification and leaderboard | Complete |
-| Rule-based portfolio mentor | Complete |
-| AI Teaching Engine | Complete |
-| Decision-quality analysis | Complete |
-| Learning memory and reinforcement | Complete |
-| AI chat and mentor reports | Complete |
-| Learning profile and trend indicators | Complete |
-| Production hardening | Complete |
-| Latest production deployment verification | Pending |
+**Disclaimer:** DalalStreetAI is an educational project, not a financial advisory service. Market data may be delayed, incomplete, or inaccurate. Nothing on the platform should be interpreted as a recommendation to invest real money.
 
 ---
 
 ## 🔮 Future Scope
 
-Potential areas for further development include:
+### 1. Evidence-Grounded Financial Learning
 
-- More comprehensive behavioral analytics.
-- Expanded financial literacy lessons and learning paths.
-- Improved historical portfolio simulations and benchmarking.
-- More robust automated testing and monitoring.
-- Enhanced accessibility and mobile responsiveness.
-- Additional educational scenarios for different investor experience levels.
+Expand the TinyFish research workflow to retrieve relevant company news, financial disclosures, and other public sources for contextual learning.
+
+### 2. Adaptive Learning Paths
+
+Develop learning paths that adjust to users' knowledge gaps, previous lessons, and recurring patterns in simulated decisions.
+
+### 3. Regional-Language Mentorship
+
+Make financial concepts accessible to more learners through explanations in additional Indian languages.
+
+### 4. Institutional Learning Analytics
+
+Explore classroom simulations, student learning dashboards, and cohort-level progress reports for colleges and financial-literacy programmes.
+
+### 5. Improved Evaluation and Reliability
+
+Expand automated testing, source-quality checks, monitoring, and measurement of learning outcomes.
 
 ---
 
-## 🌟 What Makes Dalal Street AI Different?
+## 🌟 What Makes DalalStreetAI Different?
 
-| Traditional Stock Simulator | Dalal Street AI |
+| Traditional Stock Simulator | DalalStreetAI |
 |---|---|
-| Focuses primarily on portfolio performance | Focuses on decision quality and learning |
-| Provides generic financial explanations | Uses actual trades and portfolio context |
-| Usually reacts only when users ask questions | Can trigger lessons automatically after key events |
-| Often treats profit as the primary measure of success | Evaluates reasoning separately from outcomes |
+| Primarily displays portfolio performance | Focuses on decision quality and learning |
+| Often provides generic financial explanations | Uses actual trade and portfolio context |
+| Usually reacts when users request information | Designed to trigger lessons after key events |
+| Treats profit as a primary success measure | Separates decision reasoning from trade outcomes |
 | Limited learning continuity | Tracks previously taught concepts and recurring patterns |
+| May not connect learning with external research | Plans to connect simulated decisions with relevant web sources through TinyFish |
+
+---
+
+## 💼 Business Model and Startup Potential
+
+DalalStreetAI could develop into a financial-literacy platform for individuals and educational institutions.
+
+### B2C — Individual Learners
+
+**Freemium model (proposed)**
+
+- Free stock simulation and introductory lessons.
+- Potential premium features such as advanced AI mentorship, personalized learning paths, behavioural reports, and detailed progress tracking.
+- Proposed pricing to be validated through user research and pilot testing.
+
+### B2B — Educational Institutions
+
+Potential partnerships with:
+
+- Colleges and universities.
+- Student finance and investment clubs.
+- Financial-literacy programmes.
+- Educational technology platforms.
+
+Possible offerings include classroom simulations, learning dashboards, and cohort-level progress reports.
+
+These are proposed business opportunities, not existing revenue or confirmed partnerships.
 
 ---
 
@@ -326,7 +517,7 @@ B.Tech Computer Science & Engineering — AI/ML
 
 Contributions, suggestions, bug reports, and feature requests are welcome.
 
-If you'd like to contribute:
+To contribute:
 
 1. Fork the repository.
 2. Create a feature branch.
@@ -335,5 +526,18 @@ If you'd like to contribute:
 5. Open a pull request describing your changes.
 
 ---
+
+## 🏆 Hackathon Direction
+
+DalalStreetAI is being extended toward a research-assisted financial learning experience.
+
+The core idea combines:
+
+- **Personal context:** Understand the user's simulated trades and portfolio.
+- **Web research:** Use TinyFish to retrieve relevant public financial information.
+- **AI teaching:** Use Gemini to explain relevant concepts in accessible language.
+- **Learning continuity:** Use learning memory to support future lessons.
+
+Our objective is to help beginners understand investment decisions before they risk real money.
 
 **Built with Python, Django, and AI — to help people learn investing before risking real money.** 📈
