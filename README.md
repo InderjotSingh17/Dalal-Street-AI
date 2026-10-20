@@ -511,17 +511,6 @@ To contribute:
 
 ---
 
-## 🏆 Hackathon Direction
-
-DalalStreetAI is being extended toward a research-assisted financial learning experience.
-
-The core idea combines:
-
-- **Personal context:** Understand the user's simulated trades and portfolio.
-- **Web research:** Use TinyFish to retrieve relevant public financial information.
-- **AI teaching:** Use Gemini to explain relevant concepts in accessible language.
-- **Learning continuity:** Use learning memory to support future lessons.
-
 Our objective is to help beginners understand investment decisions before they risk real money.
 
 **Built with Python, Django, and AI — to help people learn investing before risking real money.** 📈
