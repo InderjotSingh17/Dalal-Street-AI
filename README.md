@@ -114,8 +114,6 @@ DalalStreetAI identifies an opportunity to teach research and decision-making. T
 
 News headlines are not treated as proof of why a stock moved, and retrieved information is not used to predict future returns.
 
-> **Implementation note:** TinyFish is part of the hackathon integration plan. The actual workflow, API configuration, and end-to-end functionality must be verified against the current code before being represented as fully operational.
-
 ### 🎮 5. Gamified Learning
 
 - Earn experience points through supported activities.
